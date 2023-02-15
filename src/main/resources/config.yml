@@ -1,0 +1,14 @@
+max-game-duration: 600
+cops-selection-delay: 30
+door-vulnerability-chance: 1.0
+door-vulnerability-interval: 150
+door-vulnerability-duration: 8
+door-malfunction-duration: 15
+max-players: 24
+min-players-two-cops: 8
+min-players-three-cops: 16
+lobby-spawn:
+  #x: 0.0
+  #y: 0.0
+  #z: 0.0
+  #world: 'world'

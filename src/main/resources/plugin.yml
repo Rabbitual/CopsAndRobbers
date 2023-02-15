@@ -1,0 +1,14 @@
+name: CopsAndRobbers
+version: 1.0
+api-version: 1.16
+main: xyz.mauwh.candr.CopsAndRobbersPlugin
+commands:
+  candr:
+    permission: copsandrobbers.candr
+  open:
+    permission: copsandrobbers.opencells
+permissions:
+  copsandrobbers.candr:
+    default: true
+  copsandrobbers.opencells:
+    default: true
