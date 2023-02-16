@@ -219,15 +219,20 @@ public class GameSession {
     }
 
     public void restoreDoors() {
-        if (doorState == DoorState.VULNERABLE) {
-            region.getDoorLocations().stream()
-                    .map(region.getWorld()::getBlockAt)
-                    .forEach(block -> {
-                        if (block.getType() == Material.IRON_DOOR) {
-                            ((Openable) block.getBlockData()).setOpen(false);
-                        }
-                    });
+        if (doorState != DoorState.VULNERABLE) {
+            return;
         }
+
+        region.getDoorLocations().stream()
+                .map(region.getWorld()::getBlockAt)
+                .forEach(block -> {
+                    if (block.getType() != Material.IRON_DOOR) {
+                        return;
+                    }
+                    BlockData data = block.getBlockData();
+                    ((Openable)data).setOpen(false);
+                    block.setBlockData(data);
+                });
         doorState = DoorState.SECURE;
     }
 
