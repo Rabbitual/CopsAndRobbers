@@ -13,7 +13,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class EngineGameSessionTicker {
 
-    private final CopsAndRobbersEngine engine;
     private final EngineSettings settings;
     private final GameSession session;
     private int gameTick;
@@ -22,8 +21,7 @@ public class EngineGameSessionTicker {
     private int doorVulnerabilityTick;
     private int doorMalfunctionTick;
 
-    public EngineGameSessionTicker(@NotNull CopsAndRobbersEngine engine, @NotNull GameSession session) {
-        this.engine = engine;
+    public EngineGameSessionTicker(@NotNull GameSession session) {
         this.session = session;
         this.settings = session.getSettings();
     }

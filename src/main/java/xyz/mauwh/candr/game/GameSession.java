@@ -159,7 +159,7 @@ public class GameSession {
 
     public void start() {
         if (ticker == null) {
-            ticker = new EngineGameSessionTicker(engine, this);
+            ticker = new EngineGameSessionTicker(this);
         }
         ticker.reset();
         active = true;
