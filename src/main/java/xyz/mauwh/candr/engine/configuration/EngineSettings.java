@@ -114,8 +114,14 @@ public class EngineSettings {
         logger.info("Cop items: [" + String.join(" / ", copItems.stream().map(Object::toString).toArray(String[]::new)) + "]");
         logger.info("Robber items: [" + String.join(" / ", robberItems.stream().map(Object::toString).toArray(String[]::new)) + "]");
 
-        String worldName = Objects.requireNonNull(lobbySpawn.getWorld()).getName();
-        String locationString = lobbySpawn == null ? "null" : ("world: " + worldName + ", x: " + lobbySpawn.getX() + ", y: " + lobbySpawn.getY() + ", z: " + lobbySpawn.getZ());
+        String locationString;
+        if (lobbySpawn == null) {
+            locationString = "null";
+        } else {
+            String worldName = Objects.requireNonNull(lobbySpawn.getWorld()).getName();
+            locationString = String.format("world: %s, x: %s, y: %s, z: %s", worldName, lobbySpawn.getX(), lobbySpawn.getY(), lobbySpawn.getZ());
+        }
+
         logger.info("Lobby spawnpoint: [" + locationString + "]");
     }
 
