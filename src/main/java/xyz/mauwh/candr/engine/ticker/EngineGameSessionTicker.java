@@ -79,7 +79,6 @@ public class EngineGameSessionTicker {
 
         tickCopsSelection();
 
-        engine.getLogger().info("DVIT: " + doorVulnerabilityIntervalTick);
         if (shouldDoorsBecomeVulnerable()) {
             resetDoorVulnerabilityIntervalTick();
             session.makeDoorsVulnerable();
