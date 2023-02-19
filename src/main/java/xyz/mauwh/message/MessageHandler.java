@@ -53,7 +53,7 @@ public final class MessageHandler {
      */
     @NotNull
     public Component getMessage(@NotNull Message message, boolean prefixed, Object... args) {
-        String messageValue = messages.getOrDefault(message, message.defaultValue());
+        String messageValue = messages.get(message);
         Matcher matcher = placeholderPattern.matcher(messageValue);
         String replaced = matcher.replaceAll(matchResult -> {
             String strReplacementIndex = matchResult.group(1);
