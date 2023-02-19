@@ -29,28 +29,13 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
 
         BukkitAudiences audiences = BukkitAudiences.create(this);
         MessageHandler messageHandler = new MessageHandler(audiences, MiniMessage.miniMessage());
-        File messagesFile = new File(getDataFolder(), "messages.yml");
-        if (!messagesFile.exists()) {
-            saveResource("messages.yml", false);
-        }
 
-        YamlConfiguration messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
-        messagesConfig.options().copyDefaults(true);
-
-        YamlConfiguration messagesDefaults;
-        try (InputStream defaultsStream = getResource("messages.yml")) {
-            Objects.requireNonNull(defaultsStream, "null messages.yml resource (this is most likely a developer error)");
-            try (InputStreamReader reader = new InputStreamReader(defaultsStream)) {
-                messagesDefaults = YamlConfiguration.loadConfiguration(reader);
-            }
-        } catch (IOException err) {
-            builder().red("Fatal: Unable to load default messages").post(getLogger(), Level.SEVERE);
-            err.printStackTrace();
+        YamlConfiguration messagesConfig = loadMessagesConfig();
+        if (!loadAndSetDefaultMessages(messagesConfig)) {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
-        messagesConfig.setDefaults(messagesDefaults);
         messageHandler.loadMessages(messagesConfig);
 
         CopsAndRobbersEngine engine = new CopsAndRobbersEngine(this, settings, messageHandler);
@@ -59,6 +44,34 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
         getCommand("open").setExecutor(new OpenCellsCommand(engine));
 
         engine.initialize();
+    }
+
+    @NotNull
+    private YamlConfiguration loadMessagesConfig() {
+        File file = new File(getDataFolder(), "messages.yml");
+        if (!file.exists()) {
+            saveResource("messages.yml", false);
+        }
+
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+        config.options().copyDefaults(true);
+        return config;
+    }
+
+    private boolean loadAndSetDefaultMessages(@NotNull YamlConfiguration config) {
+        YamlConfiguration messagesDefaults;
+        try (InputStream defaultsStream = getResource("messages.yml")) {
+            Objects.requireNonNull(defaultsStream, "null messages.yml resource (this is most likely a developer error)");
+            try (InputStreamReader reader = new InputStreamReader(defaultsStream)) {
+                messagesDefaults = YamlConfiguration.loadConfiguration(reader);
+                config.setDefaults(messagesDefaults);
+                return true;
+            }
+        } catch (IOException err) {
+            builder().red("Fatal: Unable to load default messages").post(getLogger(), Level.SEVERE);
+            err.printStackTrace();
+            return false;
+        }
     }
 
     @NotNull
