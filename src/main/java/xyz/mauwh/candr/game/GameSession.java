@@ -17,6 +17,9 @@ import xyz.mauwh.message.MessageHandler;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
+
+import static xyz.mauwh.message.ColoredConsoleStringBuilder.builder;
 
 public class GameSession {
 
@@ -163,6 +166,7 @@ public class GameSession {
         }
         ticker.reset();
         active = true;
+        builder().green("Successfully started game (id: " + region.getId() + ")").reset().post(engine.getLogger(), Level.INFO);
     }
 
     public void tick() {

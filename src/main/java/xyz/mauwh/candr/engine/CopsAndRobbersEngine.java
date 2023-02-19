@@ -106,7 +106,6 @@ public class CopsAndRobbersEngine {
             }
             sessions.put(id, session);
             session.start();
-            builder().green("Successfully started game (id: " + id + ")").reset().post(logger, Level.INFO);
         });
 
         if (sessions.isEmpty()) {
