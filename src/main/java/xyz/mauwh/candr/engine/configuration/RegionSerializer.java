@@ -53,9 +53,9 @@ public class RegionSerializer {
         Object copSpawnPointsObj = serializedRegion.get("cop-spawn-points");
         Object robberSpawnPointsObj = serializedRegion.get("robber-spawn-points");
         Object doorLocationsObj = serializedRegion.get("door-locations");
-        Preconditions.checkArgument(copSpawnPointsObj instanceof List<?>, "Unable to deserialize region: invalid min position (%s)", minPosObj);
-        Preconditions.checkArgument(robberSpawnPointsObj instanceof List<?>, "Unable to deserialize region: invalid max position (%s)", maxPosObj);
-        Preconditions.checkArgument(doorLocationsObj instanceof List<?>, "Unable to deserialize region: invalid max position (%s)", maxPosObj);
+        Preconditions.checkArgument(copSpawnPointsObj instanceof List<?>, "Unable to deserialize region: invalid cop spawn points");
+        Preconditions.checkArgument(robberSpawnPointsObj instanceof List<?>, "Unable to deserialize region: invalid robber spawn points");
+        Preconditions.checkArgument(doorLocationsObj instanceof List<?>, "Unable to deserialize region: invalid door locations");
         List<Location> copSpawnPoints = deserializeLocationListFromMapList(world, (List<?>)copSpawnPointsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
         List<Location> robberSpawnPoints = deserializeLocationListFromMapList(world, (List<?>)robberSpawnPointsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
         List<Location> doorLocations = deserializeLocationListFromMapList(world, (List<?>)doorLocationsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
@@ -128,7 +128,7 @@ public class RegionSerializer {
      */
     private void checkArgumentSafely(boolean expression, String message) {
         if (!expression) {
-            logger.warning(message);
+            builder().yellow(message).post(logger, Level.WARNING);
         }
     }
 
