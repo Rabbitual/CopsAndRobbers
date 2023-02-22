@@ -207,15 +207,7 @@ public class GameSession {
             return;
         }
 
-        World world = region.getWorld();
-        for (Location location : region.getDoorLocations()) {
-            Block block = world.getBlockAt(location);
-            if (block.getType() == Material.IRON_DOOR) {
-                BlockData blockData = block.getBlockData();
-                ((Openable)blockData).setOpen(true);
-                block.setBlockData(blockData);
-            }
-        }
+        setDoorsOpen(true);
         doorState = DoorState.MALFUNCTIONING;
         ticker.resetDoorMalfunctionTick();
         Bukkit.broadcastMessage(ChatColor.DARK_GRAY + "[" + ChatColor.DARK_RED + "!" + ChatColor.DARK_GRAY + "] "
@@ -223,27 +215,29 @@ public class GameSession {
     }
 
     public void restoreDoors() {
-        if (doorState != DoorState.VULNERABLE) {
+        if (doorState == DoorState.SECURE) {
             return;
         }
-
-        region.getDoorLocations().stream()
-                .map(region.getWorld()::getBlockAt)
-                .forEach(block -> {
-                    if (block.getType() != Material.IRON_DOOR) {
-                        return;
-                    }
-                    BlockData data = block.getBlockData();
-                    ((Openable)data).setOpen(false);
-                    block.setBlockData(data);
-                });
+        setDoorsOpen(false);
         doorState = DoorState.SECURE;
+    }
+
+    private void setDoorsOpen(boolean open) {
+        World world = region.getWorld();
+        for (Location location : region.getDoorLocations()) {
+            Block block = world.getBlockAt(location);
+            if (block.getType() == Material.IRON_DOOR) {
+                BlockData blockData = block.getBlockData();
+                ((Openable)blockData).setOpen(open);
+                block.setBlockData(blockData);
+            }
+        }
     }
 
     public void teleportRobberToCell(@NotNull Player player) {
         List<Location> cellLocations = region.getRobberSpawnPoints();
         if (cellLocations.isEmpty()) {
-            player.sendMessage(ChatColor.DARK_RED + "[CopsAndRobbers] " + ChatColor.RED + "Unfinished (GameSession.java/221)");
+            player.sendMessage(ChatColor.DARK_RED + "[CopsAndRobbers] " + ChatColor.RED + "Unfinished (GameSession.java/246)");
             return;
         }
 
@@ -254,7 +248,14 @@ public class GameSession {
     }
 
     public void teleportPlayerToLobby(@NotNull Player player) {
-        player.teleport(settings.getLobbySpawn());
+        Location lobbySpawn = settings.getLobbySpawn();
+        if (lobbySpawn == null) {
+//            Audience audience = messageHandler.getAudiences().player(player);
+//            audience.sendMessage(messageHandler.getMessage(Message.LOBBY_NOT_FOUND, true));
+            player.sendMessage(ChatColor.DARK_RED + "[CopsAndRobbers] " + ChatColor.RED + "Unfinished (GameSession.java/262)");
+            return;
+        }
+        player.teleport(lobbySpawn);
     }
 
 }
