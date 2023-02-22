@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -220,7 +221,7 @@ public class EngineSettings {
      * The lobby spawn point, which players are teleported to when a game ends or when they leave
      * @return the lobby spawn point
      */
-    @NotNull
+    @Nullable
     public Location getLobbySpawn() {
         return lobbySpawn;
     }
