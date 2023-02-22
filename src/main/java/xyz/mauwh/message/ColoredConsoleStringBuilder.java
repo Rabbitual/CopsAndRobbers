@@ -9,10 +9,10 @@ import java.util.logging.Logger;
 public class ColoredConsoleStringBuilder {
 
     private static final Ansi ANSI = Ansi.ansi();
-    private static final Ansi YELLOW = ANSI.fgYellow().boldOff();
-    private static final Ansi RED = ANSI.fgRed().boldOff();
-    private static final Ansi GREEN = ANSI.fgGreen().boldOff();
-    private static final Ansi BLUE = ANSI.fgBlue().boldOff();
+    private static final String YELLOW = ANSI.fgYellow().boldOff().toString();
+    private static final String RED = ANSI.fgRed().boldOff().toString();
+    private static final String GREEN = ANSI.fgGreen().boldOff().toString();
+    private static final String BLUE = ANSI.fgBlue().boldOff().toString();
 
     private final StringBuilder builder = new StringBuilder();
 
