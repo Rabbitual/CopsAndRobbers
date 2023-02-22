@@ -63,7 +63,12 @@ public class RegionSerializer {
         checkArgumentSafely(!copSpawnPoints.isEmpty(), "Missing cop spawn points, expected behavior may be altered (id: " + id + ")");
         checkArgumentSafely(!robberSpawnPoints.isEmpty(), "Missing robber spawn points, expected behavior may be altered (id: " + id + ")");
         checkArgumentSafely(!doorLocations.isEmpty(), "Missing door locations, expected behavior may be altered (id: " + id + ")");
-        return new GameRegion((int)id, world, minPos, maxPos);
+
+        GameRegion region = new GameRegion((int)id, world, minPos, maxPos);
+        region.setCopSpawnPoints(copSpawnPoints);
+        region.setRobberSpawnPoints(robberSpawnPoints);
+        region.setDoorPositions(doorLocations);
+        return region;
     }
 
     /**
@@ -95,10 +100,10 @@ public class RegionSerializer {
         Object x = map.get("x");
         Object y = map.get("y");
         Object z = map.get("z");
-        if (!(x instanceof Number && y instanceof Number && z instanceof Number)) {
-            throw new IllegalArgumentException(String.format(errMessage, x, y, z));
+        if (x instanceof Number && y instanceof Number && z instanceof Number) {
+            return new Location(world, ((Number)x).doubleValue(), ((Number)y).doubleValue(), ((Number)z).doubleValue());
         }
-        return new Location(world, ((Number)x).doubleValue(), ((Number)y).doubleValue(), ((Number)z).doubleValue());
+        throw new IllegalArgumentException(String.format(errMessage, x, y, z));
     }
 
     /**
