@@ -53,17 +53,22 @@ public class RegionSerializer {
         Object copSpawnPointsObj = serializedRegion.get("cop-spawn-points");
         Object robberSpawnPointsObj = serializedRegion.get("robber-spawn-points");
         Object doorLocationsObj = serializedRegion.get("door-locations");
-        Preconditions.checkArgument(copSpawnPointsObj instanceof List<?>, "Unable to deserialize region: invalid min position (%s)", minPosObj);
-        Preconditions.checkArgument(robberSpawnPointsObj instanceof List<?>, "Unable to deserialize region: invalid max position (%s)", maxPosObj);
-        Preconditions.checkArgument(doorLocationsObj instanceof List<?>, "Unable to deserialize region: invalid max position (%s)", maxPosObj);
+        Preconditions.checkArgument(copSpawnPointsObj instanceof List<?>, "Unable to deserialize region: invalid cop spawn points");
+        Preconditions.checkArgument(robberSpawnPointsObj instanceof List<?>, "Unable to deserialize region: invalid robber spawn points");
+        Preconditions.checkArgument(doorLocationsObj instanceof List<?>, "Unable to deserialize region: invalid door locations");
         List<Location> copSpawnPoints = deserializeLocationListFromMapList(world, (List<?>)copSpawnPointsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
         List<Location> robberSpawnPoints = deserializeLocationListFromMapList(world, (List<?>)robberSpawnPointsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
         List<Location> doorLocations = deserializeLocationListFromMapList(world, (List<?>)doorLocationsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
 
-        checkArgumentSafely(copSpawnPoints.isEmpty(), "Missing cop spawn points - this game region may not function as intended");
-        checkArgumentSafely(robberSpawnPoints.isEmpty(), "Missing robber spawn points - this game region may not function as intended");
-        checkArgumentSafely(doorLocations.isEmpty(), "Missing door locations - this game region may not function as intended");
-        return new GameRegion((int)id, world, minPos, maxPos);
+        checkArgumentSafely(!copSpawnPoints.isEmpty(), "Missing cop spawn points, expected behavior may be altered (id: " + id + ")");
+        checkArgumentSafely(!robberSpawnPoints.isEmpty(), "Missing robber spawn points, expected behavior may be altered (id: " + id + ")");
+        checkArgumentSafely(!doorLocations.isEmpty(), "Missing door locations, expected behavior may be altered (id: " + id + ")");
+
+        GameRegion region = new GameRegion((int)id, world, minPos, maxPos);
+        region.setCopSpawnPoints(copSpawnPoints);
+        region.setRobberSpawnPoints(robberSpawnPoints);
+        region.setDoorPositions(doorLocations);
+        return region;
     }
 
     /**
@@ -95,10 +100,10 @@ public class RegionSerializer {
         Object x = map.get("x");
         Object y = map.get("y");
         Object z = map.get("z");
-        if (!(x instanceof Number && y instanceof Number && z instanceof Number)) {
-            throw new IllegalArgumentException(String.format(errMessage, x, y, z));
+        if (x instanceof Number && y instanceof Number && z instanceof Number) {
+            return new Location(world, ((Number)x).doubleValue(), ((Number)y).doubleValue(), ((Number)z).doubleValue());
         }
-        return new Location(world, ((Number)x).doubleValue(), ((Number)y).doubleValue(), ((Number)z).doubleValue());
+        throw new IllegalArgumentException(String.format(errMessage, x, y, z));
     }
 
     /**
@@ -128,7 +133,7 @@ public class RegionSerializer {
      */
     private void checkArgumentSafely(boolean expression, String message) {
         if (!expression) {
-            logger.warning(message);
+            builder().yellow(message).post(logger, Level.WARNING);
         }
     }
 

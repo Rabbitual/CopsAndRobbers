@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -68,9 +69,7 @@ public class EngineSettings {
         Object y = configuration.get("lobby-spawn.y");
         Object z = configuration.get("lobby-spawn.z");
         Object worldName = configuration.get("lobby-spawn.world");
-        if (!(configuration.isDouble("lobby-spawn.x") &&
-                configuration.isDouble("lobby-spawn.y") &&
-                configuration.isDouble("lobby-spawn.z"))) {
+        if (!(x instanceof Number && y instanceof Number && z instanceof Number)) {
             if (logSettings) {
                 logSettings();
             }
@@ -89,9 +88,10 @@ public class EngineSettings {
             return;
         }
 
-
-        //noinspection ConstantConditions
-        lobbySpawn = new Location(world, (double)x, (double)y, (double)z);
+        double xDbl = ((Number)x).doubleValue();
+        double yDbl = ((Number)y).doubleValue();
+        double zDbl = ((Number)z).doubleValue();
+        lobbySpawn = new Location(world, xDbl, yDbl, zDbl);
         if (logSettings) {
             logSettings();
         }
@@ -221,7 +221,7 @@ public class EngineSettings {
      * The lobby spawn point, which players are teleported to when a game ends or when they leave
      * @return the lobby spawn point
      */
-    @NotNull
+    @Nullable
     public Location getLobbySpawn() {
         return lobbySpawn;
     }
