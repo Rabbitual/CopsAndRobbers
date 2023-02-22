@@ -60,9 +60,9 @@ public class RegionSerializer {
         List<Location> robberSpawnPoints = deserializeLocationListFromMapList(world, (List<?>)robberSpawnPointsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
         List<Location> doorLocations = deserializeLocationListFromMapList(world, (List<?>)doorLocationsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
 
-        checkArgumentSafely(copSpawnPoints.isEmpty(), "Missing cop spawn points - this game region may not function as intended");
-        checkArgumentSafely(robberSpawnPoints.isEmpty(), "Missing robber spawn points - this game region may not function as intended");
-        checkArgumentSafely(doorLocations.isEmpty(), "Missing door locations - this game region may not function as intended");
+        checkArgumentSafely(!copSpawnPoints.isEmpty(), "Missing cop spawn points, expected behavior may be altered (id: " + id + ")");
+        checkArgumentSafely(!robberSpawnPoints.isEmpty(), "Missing robber spawn points, expected behavior may be altered (id: " + id + ")");
+        checkArgumentSafely(!doorLocations.isEmpty(), "Missing door locations, expected behavior may be altered (id: " + id + ")");
         return new GameRegion((int)id, world, minPos, maxPos);
     }
 
