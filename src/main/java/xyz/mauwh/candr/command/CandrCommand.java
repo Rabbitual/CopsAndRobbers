@@ -75,7 +75,12 @@ public class CandrCommand implements CommandExecutor {
             Audience playerAudience = audiences.player(player);
             Component leftGameMessage = messageHandler.getMessage(Message.LEFT_GAME, true, session.getRegion().getId());
             playerAudience.sendMessage(leftGameMessage);
-            if (!(session.removeCop(player) && !session.hasMaxAllowedCops())) {
+            if (session.removeRobber(player)) {
+                return;
+            }
+
+            boolean needsReplacementCop = session.removeCop(player) && !session.hasMaxAllowedCops();
+            if (!needsReplacementCop) {
                 return;
             }
 
