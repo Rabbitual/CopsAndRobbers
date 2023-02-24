@@ -18,3 +18,4 @@ vulnerability-detected: "<red>A vulnerability in jail <yellow>#{0}</yellow> secu
 doors-malfunctioned: "<red>The cell doors in jail <yellow>#{0}</yellow> malfunctioned! Robbers, this is your chance!"
 robber-escaped: "<dark_purple>Congratulations, <red>{0}</red>! You escaped jail #{1} and won!"
 no-escapees: "<blue>Game #{0} ended with no escapees. Cops win!"
+lobby-not-found: "<red>Unable to teleport to lobby, this is an administrator error"

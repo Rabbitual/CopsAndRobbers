@@ -23,7 +23,7 @@ public enum Message {
     DOORS_MALFUNCTIONED("doors-malfunctioned"),
     ROBBER_ESCAPED("robber-escaped"),
     NO_ESCAPEES("no-escapees"),
-    ;
+    LOBBY_NOT_FOUND("lobby-not-found");
 
     private final String path;
 
