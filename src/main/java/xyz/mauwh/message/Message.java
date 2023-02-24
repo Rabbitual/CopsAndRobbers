@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 public enum Message {
     PREFIX("plugin-prefix"),
+    ENGINE_IS_HALTED("engine-is-halted"),
     CANDR_COMMAND_USAGE("candr-command-usage"),
     PLAYERS_ONLY_COMMAND("players-only-command"),
     ROBBERS_ONLY_COMMAND("robbers-only-command"),

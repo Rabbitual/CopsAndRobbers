@@ -3,7 +3,6 @@ package xyz.mauwh.candr.command;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -44,7 +43,9 @@ public class CandrCommand implements CommandExecutor {
         }
 
         if (!engine.isActive()) {
-            sender.sendMessage(ChatColor.DARK_RED + "[CopsAndRobbers] " + ChatColor.RED + "Engine is currently halted - please contact an admin if you believe this is an error");
+            Component engineHaltedMessage = messageHandler.getMessage(Message.ENGINE_IS_HALTED, true);
+            senderAudience.sendMessage(engineHaltedMessage);
+            return true;
         }
 
         Player player = (Player)sender;

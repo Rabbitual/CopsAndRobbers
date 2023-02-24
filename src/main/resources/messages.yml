@@ -1,4 +1,5 @@
 plugin-prefix: "<dark_red>[CopsAndRobbers] </dark_red>"
+engine-is-halted: "Engine is currently halted, please contact an admin if you believe this is an error"
 candr-command-usage: "<red>Usage: /candr join [{0}], /candr leave, /candr quit"
 players-only-command: "<red>Only players may use this command"
 robbers-only-command: "<red>Only robbers may use this command"
