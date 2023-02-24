@@ -29,6 +29,12 @@ public class CandrCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         BukkitAudiences audiences = messageHandler.getAudiences();
         Audience senderAudience = audiences.sender(sender);
+        if (!engine.isActive()) {
+            Component engineHaltedMessage = messageHandler.getMessage(Message.ENGINE_IS_HALTED, true);
+            senderAudience.sendMessage(engineHaltedMessage);
+            return true;
+        }
+
         if (!(sender instanceof Player)) {
             Component message = messageHandler.getMessage(Message.PLAYERS_ONLY_COMMAND, true);
             senderAudience.sendMessage(message);
@@ -42,20 +48,12 @@ public class CandrCommand implements CommandExecutor {
             return true;
         }
 
-        if (!engine.isActive()) {
-            Component engineHaltedMessage = messageHandler.getMessage(Message.ENGINE_IS_HALTED, true);
-            senderAudience.sendMessage(engineHaltedMessage);
-            return true;
-        }
-
         Player player = (Player)sender;
-        String subcommand = args[0];
-        if (subcommand.equals("join")) {
-            joinSubcommand.execute(player, args);
-        } else if (subcommand.equals("leave") || subcommand.equals("quit")) {
-            executeLeaveCommand(player);
-        } else {
-            senderAudience.sendMessage(helpMessage);
+        String subcommand = args[0].toLowerCase();
+        switch (subcommand) {
+            case "leave", "quit" -> executeLeaveCommand(player);
+            case "join" -> joinSubcommand.execute(player, args);
+            default -> senderAudience.sendMessage(helpMessage);
         }
 
         return true;
