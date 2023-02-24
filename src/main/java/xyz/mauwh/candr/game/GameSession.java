@@ -1,5 +1,6 @@
 package xyz.mauwh.candr.game;
 
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -250,9 +251,8 @@ public class GameSession {
     public void teleportPlayerToLobby(@NotNull Player player) {
         Location lobbySpawn = settings.getLobbySpawn();
         if (lobbySpawn == null) {
-//            Audience audience = messageHandler.getAudiences().player(player);
-//            audience.sendMessage(messageHandler.getMessage(Message.LOBBY_NOT_FOUND, true));
-            player.sendMessage(ChatColor.DARK_RED + "[CopsAndRobbers] " + ChatColor.RED + "Unfinished (GameSession.java/262)");
+            Audience audience = messageHandler.getAudiences().player(player);
+            audience.sendMessage(messageHandler.getMessage(Message.LOBBY_NOT_FOUND, true));
             return;
         }
         player.teleport(lobbySpawn);
