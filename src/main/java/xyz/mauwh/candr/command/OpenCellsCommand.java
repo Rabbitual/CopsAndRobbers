@@ -1,17 +1,18 @@
 package xyz.mauwh.candr.command;
 
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
+import xyz.mauwh.candr.game.DoorState;
 import xyz.mauwh.candr.game.GameSession;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
-
-import java.util.Collection;
 
 public class OpenCellsCommand implements CommandExecutor {
 
@@ -37,16 +38,27 @@ public class OpenCellsCommand implements CommandExecutor {
             return true;
         }
 
-        Collection<GameSession> sessions = engine.getSessions().values();
-        for (GameSession session : sessions) {
-            if (session.isCop(player)) {
-                senderAudience.sendMessage(messageHandler.getMessage(Message.ROBBERS_ONLY_COMMAND, true));
-            } else if (session.isRobber(player)) {
-                session.malfunctionDoors();
-            } else {
-                senderAudience.sendMessage(messageHandler.getMessage(Message.NOT_TIME_FOR_COMMAND, true));
+        for (GameSession session : engine.getSessions().values()) {
+            boolean isCop = session.isCop(player);
+            boolean isRobber = session.isRobber(player);
+            boolean doorsVulnerable = session.getDoorState() == DoorState.VULNERABLE;
+            if (!isCop && !isRobber) {
+                continue;
             }
+
+            if (isCop) {
+                Component message = messageHandler.getMessage(Message.ROBBERS_ONLY_COMMAND, true);
+                senderAudience.sendMessage(message);
+            } else if (!doorsVulnerable) {
+                Component message = messageHandler.getMessage(Message.NOT_TIME_FOR_COMMAND, true);
+                senderAudience.sendMessage(message);
+            } else {
+                session.malfunctionDoors();
+            }
+            return true;
         }
+
+        senderAudience.sendMessage(Component.text("You have reached limbo?!", NamedTextColor.GRAY));
         return true;
     }
 
