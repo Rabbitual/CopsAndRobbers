@@ -65,28 +65,31 @@ public class CandrCommand implements CommandExecutor {
      */
     private void executeLeaveCommand(@NotNull Player player) {
         BukkitAudiences audiences = messageHandler.getAudiences();
-        for (GameSession session : engine.getSessions().values()) {
-            if (!session.isPlayer(player)) {
-                continue;
-            }
-
-            session.teleportPlayerToLobby(player);
-            Audience playerAudience = audiences.player(player);
-            Component leftGameMessage = messageHandler.getMessage(Message.LEFT_GAME, true, session.getRegion().getId());
-            playerAudience.sendMessage(leftGameMessage);
-            if (session.removeRobber(player)) {
-                return;
-            }
-
-            boolean needsReplacementCop = session.removeCop(player) && !session.hasMaxAllowedCops();
-            if (!needsReplacementCop) {
-                return;
-            }
-
-            int id = session.getRegion().getId();
-            Component copRetiredMessage = messageHandler.getMessage(Message.COP_RETIRED, true, id);
-            audiences.all().sendMessage(copRetiredMessage);
+        GameSession session = engine.getGameSession(player);
+        Audience playerAudience = audiences.player(player);
+        if (session == null) {
+            Component noGameMessage = messageHandler.getMessage(Message.GAME_DOES_NOT_EXIST, true);
+            playerAudience.sendMessage(noGameMessage);
+            return;
         }
+
+        session.teleportPlayerToLobby(player);
+
+        int id = session.getRegion().getId();
+        Component leftGameMessage = messageHandler.getMessage(Message.LEFT_GAME, true, id);
+
+        playerAudience.sendMessage(leftGameMessage);
+        if (session.removeRobber(player)) {
+            return;
+        }
+
+        boolean needsReplacementCop = session.removeCop(player) && !session.hasMaxAllowedCops();
+        if (!needsReplacementCop) {
+            return;
+        }
+
+        Component copRetiredMessage = messageHandler.getMessage(Message.COP_RETIRED, true, id);
+        audiences.all().sendMessage(copRetiredMessage);
     }
 
 }
