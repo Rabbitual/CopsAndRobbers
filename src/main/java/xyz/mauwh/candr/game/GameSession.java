@@ -25,9 +25,9 @@ import static xyz.mauwh.message.ColoredConsoleStringBuilder.builder;
 public class GameSession {
 
     private final CopsAndRobbersEngine engine;
-    private final EngineSettings settings;
     private final MessageHandler messageHandler;
     private final GameRegion region;
+    private EngineSettings settings;
     private EngineGameSessionTicker ticker;
     private boolean active;
 
@@ -167,6 +167,7 @@ public class GameSession {
     }
 
     public void start() {
+        settings = engine.getSettings();
         if (ticker == null) {
             ticker = new EngineGameSessionTicker(this);
         }
@@ -190,22 +191,19 @@ public class GameSession {
             Component message = messageHandler.getMessage(Message.ROBBER_ESCAPED, true, winner.getName(), region.getId());
             audiences.all().sendMessage(message);
         }
-
-        for (List<Player> players : List.of(robbers, cops)) {
-            Iterator<Player> iter = players.iterator();
-            while (iter.hasNext()) {
-                Player player = iter.next();
-                teleportPlayerToLobby(player);
-                iter.remove();
-            }
+        for (Player player : getPlayers()) {
+            teleportPlayerToLobby(player);
+            removeCop(player);
+            removeRobber(player);
         }
         restoreDoors();
     }
 
     public void makeDoorsVulnerable() {
         doorState = DoorState.VULNERABLE;
-        Bukkit.broadcastMessage(String.format("%1$s[%2$s!%1$s] %3$sA vulnerability in jail %4$s#%5$s%3$s's security has been detected! Robbers, type '/open cells' and make your jailbreak!",
-                ChatColor.DARK_GRAY, ChatColor.DARK_RED, ChatColor.YELLOW, ChatColor.GOLD, region.getId()));
+        Component message = messageHandler.getMessage(Message.VULNERABILITY_DETECTED, false, region.getId());
+        BukkitAudiences audiences = messageHandler.getAudiences();
+        audiences.all().sendMessage(message);
     }
 
     public void malfunctionDoors() {
@@ -216,8 +214,10 @@ public class GameSession {
         setDoorsOpen(true);
         doorState = DoorState.MALFUNCTIONING;
         ticker.resetDoorMalfunctionTick();
-        Bukkit.broadcastMessage(ChatColor.DARK_GRAY + "[" + ChatColor.DARK_RED + "!" + ChatColor.DARK_GRAY + "] "
-                + ChatColor.RED + "The doors in jail " + ChatColor.GOLD + "#" + region.getId() + ChatColor.RED + " are malfunctioning! Robbers, now's your chance!");
+
+        Component message = messageHandler.getMessage(Message.DOORS_MALFUNCTIONED, false, region.getId());
+        BukkitAudiences audiences = messageHandler.getAudiences();
+        audiences.all().sendMessage(message);
     }
 
     public void restoreDoors() {
