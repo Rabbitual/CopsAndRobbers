@@ -47,6 +47,11 @@ public class GameSession {
     }
 
     @NotNull
+    public CopsAndRobbersEngine getEngine() {
+        return engine;
+    }
+
+    @NotNull
     public EngineSettings getSettings() {
         return settings;
     }

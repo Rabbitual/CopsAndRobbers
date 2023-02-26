@@ -2,7 +2,6 @@ package xyz.mauwh.candr.engine.ticker;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
 import xyz.mauwh.candr.game.DoorState;
 import xyz.mauwh.candr.game.GameSession;
@@ -13,8 +12,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class EngineGameSessionTicker {
 
-    private final EngineSettings settings;
     private final GameSession session;
+    private EngineSettings settings;
     private int gameTick;
     private int copsSelectionTick;
     private int doorVulnerabilityIntervalTick;
@@ -27,6 +26,7 @@ public class EngineGameSessionTicker {
     }
 
     public void reset() {
+        settings = session.getSettings();
         gameTick = settings.getMaxGameDuration();
         resetDoorVulnerabilityIntervalTick();
         resetDoorVulnerabilityTick();
