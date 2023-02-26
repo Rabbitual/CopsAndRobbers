@@ -42,30 +42,26 @@ public class RegionSerializer {
 
         Object minPosObj = serializedRegion.get("min-pos");
         Object maxPosObj = serializedRegion.get("max-pos");
+        Object copSpawnPointObj = serializedRegion.get("cop-spawn-point");
         Preconditions.checkArgument(minPosObj instanceof Map<?, ?>, "Unable to deserialize region: invalid min position (%s)", minPosObj);
         Preconditions.checkArgument(maxPosObj instanceof Map<?, ?>, "Unable to deserialize region: invalid max position (%s)", maxPosObj);
+        Preconditions.checkArgument(copSpawnPointObj instanceof Map<?, ?>, "Unable to deserialize region: invalid cop spawn point (%s)", copSpawnPointObj);
 
         Location minPos = deserializeLocationFromCoordinateMap(world, (Map<?, ?>)minPosObj, "Unable to deserialize region: invalid min position");
         Location maxPos = deserializeLocationFromCoordinateMap(world, (Map<?, ?>)maxPosObj, "Unable to deserialize region: invalid max position");
-        minPos.setWorld(world);
-        maxPos.setWorld(world);
+        Location copSpawnPoint = deserializeLocationFromCoordinateMap(world, (Map<?, ?>)maxPosObj, "Unable to deserialize region: invalid cop spawn point");
 
-        Object copSpawnPointsObj = serializedRegion.get("cop-spawn-points");
         Object robberSpawnPointsObj = serializedRegion.get("robber-spawn-points");
         Object doorLocationsObj = serializedRegion.get("door-locations");
-        Preconditions.checkArgument(copSpawnPointsObj instanceof List<?>, "Unable to deserialize region: invalid cop spawn points");
         Preconditions.checkArgument(robberSpawnPointsObj instanceof List<?>, "Unable to deserialize region: invalid robber spawn points");
         Preconditions.checkArgument(doorLocationsObj instanceof List<?>, "Unable to deserialize region: invalid door locations");
-        List<Location> copSpawnPoints = deserializeLocationListFromMapList(world, (List<?>)copSpawnPointsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
         List<Location> robberSpawnPoints = deserializeLocationListFromMapList(world, (List<?>)robberSpawnPointsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
         List<Location> doorLocations = deserializeLocationListFromMapList(world, (List<?>)doorLocationsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
 
-        checkArgumentSafely(!copSpawnPoints.isEmpty(), "Missing cop spawn points, expected behavior may be altered (id: " + id + ")");
         checkArgumentSafely(!robberSpawnPoints.isEmpty(), "Missing robber spawn points, expected behavior may be altered (id: " + id + ")");
         checkArgumentSafely(!doorLocations.isEmpty(), "Missing door locations, expected behavior may be altered (id: " + id + ")");
 
-        GameRegion region = new GameRegion((int)id, world, minPos, maxPos);
-        region.setCopSpawnPoints(copSpawnPoints);
+        GameRegion region = new GameRegion((int)id, world, minPos, maxPos, copSpawnPoint);
         region.setRobberSpawnPoints(robberSpawnPoints);
         region.setDoorPositions(doorLocations);
         return region;
@@ -82,7 +78,7 @@ public class RegionSerializer {
         regionMap.put("world", region.getWorld().getName());
         regionMap.put("min-pos", region.getMinPos());
         regionMap.put("max-pos", region.getMaxPos());
-        regionMap.put("cop-spawn-points", region.getCopSpawnPoints());
+        regionMap.put("cop-spawn-point", region.getCopSpawnPoint());
         regionMap.put("robber-spawn-points", region.getRobberSpawnPoints());
         regionMap.put("door-locations", region.getDoorLocations());
         return regionMap;

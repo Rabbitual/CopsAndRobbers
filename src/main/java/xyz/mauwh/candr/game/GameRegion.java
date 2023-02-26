@@ -13,16 +13,16 @@ public class GameRegion {
     private final World world;
     private final Location minPos;
     private final Location maxPos;
-    private List<Location> copSpawnPoints;
+    private final Location copSpawnPoint;
     private List<Location> robberSpawnPoints;
     private List<Location> doorPositions;
 
-    public GameRegion(int id, @NotNull World world, @NotNull Location minPos, @NotNull Location maxPos) {
+    public GameRegion(int id, @NotNull World world, @NotNull Location minPos, @NotNull Location maxPos, @NotNull Location copSpawnPoint) {
         this.id = id;
         this.world = world;
         this.minPos = minPos;
         this.maxPos = maxPos;
-        this.copSpawnPoints = new ArrayList<>();
+        this.copSpawnPoint = copSpawnPoint;
         this.robberSpawnPoints = new ArrayList<>();
         this.doorPositions = new ArrayList<>();
     }
@@ -47,12 +47,8 @@ public class GameRegion {
     }
 
     @NotNull
-    public List<Location> getCopSpawnPoints() {
-        return List.copyOf(copSpawnPoints);
-    }
-
-    public void setCopSpawnPoints(@NotNull List<Location> copSpawnPoints) {
-        this.copSpawnPoints = List.copyOf(copSpawnPoints);
+    public Location getCopSpawnPoint() {
+        return copSpawnPoint.clone();
     }
 
     @NotNull
