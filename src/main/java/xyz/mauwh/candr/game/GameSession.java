@@ -243,7 +243,9 @@ public class GameSession {
     public void teleportRobberToCell(@NotNull Player player) {
         List<Location> cellLocations = region.getRobberSpawnPoints();
         if (cellLocations.isEmpty()) {
-            player.sendMessage(ChatColor.DARK_RED + "[CopsAndRobbers] " + ChatColor.RED + "Unfinished (GameSession.java/246)");
+            Component message = messageHandler.getMessage(Message.CELLS_NOT_FOUND, true);
+            Audience audience = messageHandler.getAudiences().player(player);
+            audience.sendMessage(message);
             return;
         }
 

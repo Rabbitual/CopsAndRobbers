@@ -19,4 +19,5 @@ vulnerability-detected: "<gray>[<dark_red>!</dark_red>]</gray> <yellow>A vulnera
 doors-malfunctioned: "<gray>[<dark_red>!</dark_red>]</gray> <red>The cell doors in jail <gold>#{0}</gold> are malfunctioning! Robbers, now's your chance!"
 robber-escaped: "<dark_purple>Congratulations, <red>{0}</red>! You escaped jail #{1} and won!"
 no-escapees: "<blue>Game #{0} ended with no escapees. Cops win!"
-lobby-not-found: "<red>Unable to teleport to lobby, this is an administrator error"
+lobby-not-found: "<red>Unable to teleport to lobby, this is likely an administrator error"
+cells-not-found: "<red>Unable to teleport to a cell, this is likely an administrator error"
