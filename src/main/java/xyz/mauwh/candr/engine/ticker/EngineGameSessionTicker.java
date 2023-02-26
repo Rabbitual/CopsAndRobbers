@@ -112,6 +112,7 @@ public class EngineGameSessionTicker {
                 index = random.nextInt(size);
             }
             Player newCop = copApplicants.get(index);
+            session.removeRobber(newCop);
             session.addCop(newCop);
             session.removeCopApplicant(newCop);
             //session.teleportCopToMainRoom(newCop);
