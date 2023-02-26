@@ -62,11 +62,8 @@ public class GameSession {
     }
 
     public boolean addRobber(@NotNull Player player) {
-        if (isFull()) {
-            return false;
-        }
-        robbers.add(player);
-        return true;
+        //noinspection ConstantConditions
+        return !isFull() && robbers.add(player);
     }
 
     public boolean removeRobber(@NotNull Player player) {
