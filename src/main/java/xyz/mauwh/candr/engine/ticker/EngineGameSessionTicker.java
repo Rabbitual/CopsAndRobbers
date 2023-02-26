@@ -115,7 +115,7 @@ public class EngineGameSessionTicker {
             session.removeRobber(newCop);
             session.addCop(newCop);
             session.removeCopApplicant(newCop);
-            //session.teleportCopToMainRoom(newCop);
+            session.teleportCopToMainRoom(newCop);
         }
         copsSelectionTick--;
     }

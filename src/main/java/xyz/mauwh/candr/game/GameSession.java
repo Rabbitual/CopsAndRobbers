@@ -253,6 +253,10 @@ public class GameSession {
         player.teleport(spawnPos);
     }
 
+    public void teleportCopToMainRoom(@NotNull Player player) {
+        player.teleport(region.getCopSpawnPoint());
+    }
+
     public void teleportPlayerToLobby(@NotNull Player player) {
         Location lobbySpawn = settings.getLobbySpawn();
         if (lobbySpawn == null) {
