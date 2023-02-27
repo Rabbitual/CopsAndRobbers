@@ -31,9 +31,9 @@ public class GameSession {
     private EngineGameSessionTicker ticker;
     private boolean active;
 
-    private final List<Player> cops;
-    private final List<Player> robbers;
-    private final List<Player> copApplicants;
+    private final Set<Player> cops;
+    private final Set<Player> robbers;
+    private final Set<Player> copApplicants;
     private DoorState doorState = DoorState.SECURE;
 
     public GameSession(@NotNull CopsAndRobbersEngine engine, @NotNull GameRegion region) {
@@ -41,9 +41,9 @@ public class GameSession {
         this.settings = engine.getSettings();
         this.messageHandler = engine.getMessageHandler();
         this.region = region;
-        this.cops = new ArrayList<>();
-        this.robbers = new ArrayList<>();
-        this.copApplicants = new ArrayList<>();
+        this.cops = new HashSet<>();
+        this.robbers = new HashSet<>();
+        this.copApplicants = new HashSet<>();
     }
 
     @NotNull
@@ -62,7 +62,6 @@ public class GameSession {
     }
 
     public boolean addRobber(@NotNull Player player) {
-        //noinspection ConstantConditions
         return !isFull() && robbers.add(player);
     }
 
@@ -75,8 +74,8 @@ public class GameSession {
     }
 
     @NotNull
-    public List<Player> getRobbers() {
-        return Collections.unmodifiableList(robbers);
+    public Set<Player> getRobbers() {
+        return Collections.unmodifiableSet(robbers);
     }
 
     public void addCop(@NotNull Player player) {
@@ -92,8 +91,8 @@ public class GameSession {
     }
 
     @NotNull
-    public List<Player> getCops() {
-        return Collections.unmodifiableList(cops);
+    public Set<Player> getCops() {
+        return Collections.unmodifiableSet(cops);
     }
 
     public boolean hasMaxAllowedCops() {
