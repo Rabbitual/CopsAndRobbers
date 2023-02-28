@@ -107,8 +107,7 @@ public class GameSession {
 
     public boolean addCopApplicant(@NotNull Player player) {
         if (isPlayer(player) && !hasMaxAllowedCops()) {
-            copApplicants.add(player);
-            return true;
+            return copApplicants.add(player);
         }
         return false;
     }
