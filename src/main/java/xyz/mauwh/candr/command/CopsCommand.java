@@ -2,8 +2,6 @@ package xyz.mauwh.candr.command;
 
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -35,39 +33,20 @@ public class CopsCommand implements CommandExecutor {
 
         Player player = (Player)sender;
         GameSession session = engine.getGameSession(player);
+        Message message;
         if (session == null) {
-            messageHandler.sendMessage(audience, Message.IN_GAME_ONLY_COMMAND, true);
-            return true;
+            message = Message.IN_GAME_ONLY_COMMAND;
+        } else if (session.isCop(player)) {
+            message = Message.ALREADY_A_COP;
+        } else if (session.hasMaxAllowedCops()) {
+            message = Message.NOT_ACCEPTING_APPLICATIONS;
+        } else if (!session.addCopApplicant(player)) {
+            message = Message.ALREADY_APPLIED_FOR_COP;
+        } else {
+            message = Message.APPLIED_FOR_COP;
         }
 
-        Component prefix = messageHandler.getMessage(Message.PREFIX, false);
-        if (session.isCop(player)) {
-            // Todo: Add message - "<red>You are already a cop"
-            Component message = Component.text("You are already a cop", NamedTextColor.RED);
-            Component prefixed = Component.text().append(prefix).append(message).build();
-            audience.sendMessage(prefixed);
-            return true;
-        }
-
-        if (session.hasMaxAllowedCops()) {
-            // Todo: Add message - "<red>New cop applications are not currently being accepted"
-            Component message = Component.text("New cop applications are not currently being accepted", NamedTextColor.RED);
-            Component prefixed = Component.text().append(prefix).append(message).build();
-            audience.sendMessage(prefixed);
-            return true;
-        }
-
-        if (!session.addCopApplicant(player)) {
-            Component message = Component.text("You already applied to be a cop", NamedTextColor.RED);
-            Component prefixed = Component.text().append(prefix).append(message).build();
-            audience.sendMessage(prefixed);
-            return true;
-        }
-
-        // Todo: Add message - "<blue>You have applied to be a cop"
-        Component message = Component.text("You have applied to be a cop", NamedTextColor.BLUE);
-        Component prefixed = Component.text().append(prefix).append(message).build();
-        audience.sendMessage(prefixed);
+        messageHandler.sendMessage(audience, message, true);
         return true;
     }
 
