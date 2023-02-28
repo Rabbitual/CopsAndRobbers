@@ -55,13 +55,11 @@ public class EngineSettings {
         doorVulnerabilityChance = configuration.getDouble("door-vulnerability-chance");
         maxGameDuration = configuration.getInt("max-game-duration");
 
-        var unexpectedBehavior = builder().yellow("The plugin might not function as expected").reset();
         if (!configuration.isConfigurationSection("lobby-spawn")) {
             if (logSettings) {
                 logSettings();
             }
             builder().yellow("Unable to set lobby spawn: no lobby configured").reset().post(logger, Level.WARNING);
-            unexpectedBehavior.post(logger, Level.WARNING);
             return;
         }
 
@@ -74,7 +72,6 @@ public class EngineSettings {
                 logSettings();
             }
             builder().yellow("Unable to set lobby spawn: invalid coordinates").reset().post(logger, Level.WARNING);
-            unexpectedBehavior.post(logger, Level.WARNING);
             return;
         }
 
@@ -84,7 +81,6 @@ public class EngineSettings {
                 logSettings();
             }
             builder().yellow("Unable to set lobby: unable to find world with name '" + worldName + "'").reset().post(logger, Level.WARNING);
-            unexpectedBehavior.post(logger, Level.WARNING);
             return;
         }
 
