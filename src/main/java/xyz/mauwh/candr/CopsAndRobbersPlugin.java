@@ -7,6 +7,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.command.CandrCommand;
+import xyz.mauwh.candr.command.CopsCommand;
 import xyz.mauwh.candr.command.OpenCellsCommand;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
@@ -41,6 +42,7 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
         CopsAndRobbersEngine engine = new CopsAndRobbersEngine(this, settings, messageHandler);
 
         getCommand("candr").setExecutor(new CandrCommand(engine));
+        getCommand("cops").setExecutor(new CopsCommand(engine));
         getCommand("open").setExecutor(new OpenCellsCommand(engine));
 
         engine.initialize();

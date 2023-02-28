@@ -1,8 +1,10 @@
 package xyz.mauwh.message;
 
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
@@ -69,6 +71,15 @@ public final class MessageHandler {
             result = Component.text().append(getMessage(Message.PREFIX, false)).append(result).build();
         }
         return result;
+    }
+
+    public void sendMessage(@NotNull CommandSender recipient, @NotNull Message message, boolean prefixed, Object... args) {
+        sendMessage(audiences.sender(recipient), message, prefixed, args);
+    }
+
+    public void sendMessage(@NotNull Audience audience, @NotNull Message message, boolean prefixed, Object... args) {
+        Component component = getMessage(message, prefixed, args);
+        audience.sendMessage(component);
     }
 
 }
