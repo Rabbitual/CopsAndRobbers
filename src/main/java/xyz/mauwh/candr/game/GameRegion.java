@@ -3,6 +3,7 @@ package xyz.mauwh.candr.game;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,16 +14,15 @@ public class GameRegion {
     private final World world;
     private final Location minPos;
     private final Location maxPos;
-    private final Location copSpawnPoint;
+    private Location copSpawnPoint;
     private List<Location> robberSpawnPoints;
     private List<Location> doorPositions;
 
-    public GameRegion(int id, @NotNull World world, @NotNull Location minPos, @NotNull Location maxPos, @NotNull Location copSpawnPoint) {
+    public GameRegion(int id, @NotNull World world, @NotNull Location minPos, @NotNull Location maxPos) {
         this.id = id;
         this.world = world;
         this.minPos = minPos;
         this.maxPos = maxPos;
-        this.copSpawnPoint = copSpawnPoint;
         this.robberSpawnPoints = new ArrayList<>();
         this.doorPositions = new ArrayList<>();
     }
@@ -46,9 +46,13 @@ public class GameRegion {
         return maxPos.clone();
     }
 
-    @NotNull
+    @Nullable
     public Location getCopSpawnPoint() {
-        return copSpawnPoint.clone();
+        return copSpawnPoint == null ? null : copSpawnPoint.clone();
+    }
+
+    public void setCopSpawnPoint(@Nullable Location location) {
+        this.copSpawnPoint = location == null ? null : location.clone();
     }
 
     @NotNull

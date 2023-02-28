@@ -45,7 +45,6 @@ public class RegionSerializer {
         Object copSpawnPointObj = serializedRegion.get("cop-spawn-point");
         Preconditions.checkArgument(minPosObj instanceof Map<?, ?>, "Unable to deserialize region: invalid min position (%s)", minPosObj);
         Preconditions.checkArgument(maxPosObj instanceof Map<?, ?>, "Unable to deserialize region: invalid max position (%s)", maxPosObj);
-        Preconditions.checkArgument(copSpawnPointObj instanceof Map<?, ?>, "Unable to deserialize region: invalid cop spawn point (%s)", copSpawnPointObj);
 
         Location minPos = deserializeLocationFromCoordinateMap(world, (Map<?, ?>)minPosObj, "Unable to deserialize region: invalid min position");
         Location maxPos = deserializeLocationFromCoordinateMap(world, (Map<?, ?>)maxPosObj, "Unable to deserialize region: invalid max position");
@@ -58,10 +57,12 @@ public class RegionSerializer {
         List<Location> robberSpawnPoints = deserializeLocationListFromMapList(world, (List<?>)robberSpawnPointsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
         List<Location> doorLocations = deserializeLocationListFromMapList(world, (List<?>)doorLocationsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
 
+        checkArgumentSafely(copSpawnPointObj instanceof Map<?, ?>, "Missing or invalid cop spawn point, expected behavior may be altered (id: " + id + ")");
         checkArgumentSafely(!robberSpawnPoints.isEmpty(), "Missing robber spawn points, expected behavior may be altered (id: " + id + ")");
         checkArgumentSafely(!doorLocations.isEmpty(), "Missing door locations, expected behavior may be altered (id: " + id + ")");
 
-        GameRegion region = new GameRegion((int)id, world, minPos, maxPos, copSpawnPoint);
+        GameRegion region = new GameRegion((int)id, world, minPos, maxPos);
+        region.setCopSpawnPoint(copSpawnPoint);
         region.setRobberSpawnPoints(robberSpawnPoints);
         region.setDoorPositions(doorLocations);
         return region;

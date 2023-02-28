@@ -3,6 +3,7 @@ package xyz.mauwh.candr.game;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -252,7 +253,17 @@ public class GameSession {
     }
 
     public void teleportCopToMainRoom(@NotNull Player player) {
-        player.teleport(region.getCopSpawnPoint());
+        Location copSpawn = region.getCopSpawnPoint();
+        if (copSpawn == null) {
+            Audience audience = messageHandler.getAudiences().player(player);
+            Component prefix = messageHandler.getMessage(Message.PREFIX, false);
+            Component message = Component.text("Unable to teleport to the jail main room, this is most likely an administrator error", NamedTextColor.RED);
+            Component prefixed = Component.text().append(prefix).append(message).build();
+            audience.sendMessage(prefixed);
+//            audience.sendMessage(messageHandler.getMessage(Message.MAIN_ROOM_NOT_FOUND, true));
+            return;
+        }
+        player.teleport(copSpawn);
     }
 
     public void teleportPlayerToLobby(@NotNull Player player) {
