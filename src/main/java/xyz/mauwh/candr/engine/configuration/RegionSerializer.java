@@ -48,7 +48,6 @@ public class RegionSerializer {
 
         Location minPos = deserializeLocationFromCoordinateMap(world, (Map<?, ?>)minPosObj, "Unable to deserialize region: invalid min position");
         Location maxPos = deserializeLocationFromCoordinateMap(world, (Map<?, ?>)maxPosObj, "Unable to deserialize region: invalid max position");
-        Location copSpawnPoint = deserializeLocationFromCoordinateMap(world, (Map<?, ?>)maxPosObj, "Unable to deserialize region: invalid cop spawn point");
 
         Object robberSpawnPointsObj = serializedRegion.get("robber-spawn-points");
         Object doorLocationsObj = serializedRegion.get("door-locations");
@@ -57,12 +56,16 @@ public class RegionSerializer {
         List<Location> robberSpawnPoints = deserializeLocationListFromMapList(world, (List<?>)robberSpawnPointsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
         List<Location> doorLocations = deserializeLocationListFromMapList(world, (List<?>)doorLocationsObj, "Unable to deserialize cop spawn point for region id " + id + "(x: %s, y: %s, z: %s)");
 
-        checkArgumentSafely(copSpawnPointObj instanceof Map<?, ?>, "Missing or invalid cop spawn point, expected behavior may be altered (id: " + id + ")");
+        GameRegion region = new GameRegion((int)id, world, minPos, maxPos);
+
         checkArgumentSafely(!robberSpawnPoints.isEmpty(), "Missing robber spawn points, expected behavior may be altered (id: " + id + ")");
         checkArgumentSafely(!doorLocations.isEmpty(), "Missing door locations, expected behavior may be altered (id: " + id + ")");
+        if (checkArgumentSafely(copSpawnPointObj instanceof Map<?, ?>, "Missing or invalid cop spawn point, expected behavior may be altered (id: " + id + ")")) {
+            //noinspection ConstantConditions
+            Location copSpawnPoint = deserializeLocationFromCoordinateMap(world, (Map<?, ?>)copSpawnPointObj, "");
+            region.setCopSpawnPoint(copSpawnPoint);
+        }
 
-        GameRegion region = new GameRegion((int)id, world, minPos, maxPos);
-        region.setCopSpawnPoint(copSpawnPoint);
         region.setRobberSpawnPoints(robberSpawnPoints);
         region.setDoorPositions(doorLocations);
         return region;
@@ -127,11 +130,14 @@ public class RegionSerializer {
      * Logs a warning if the provided expression evaluates to false
      * @param expression - the expression to assert as true
      * @param message - the warning message used if the provided expression evaluates to false
+     * @return true if the provided expression evaluates to true
      */
-    private void checkArgumentSafely(boolean expression, String message) {
+    private boolean checkArgumentSafely(boolean expression, String message) {
         if (!expression) {
             builder().yellow(message).post(logger, Level.WARNING);
+            return false;
         }
+        return true;
     }
 
 }
