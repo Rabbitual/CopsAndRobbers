@@ -165,7 +165,7 @@ public class GameSession {
     public void start() {
         settings = engine.getSettings();
         if (ticker == null) {
-            ticker = new EngineGameSessionTicker(this);
+            ticker = new EngineGameSessionTicker(this, messageHandler);
         }
         ticker.reset();
         active = true;
@@ -209,7 +209,7 @@ public class GameSession {
 
         setDoorsOpen(true);
         doorState = DoorState.MALFUNCTIONING;
-        ticker.resetDoorMalfunctionTick();
+        ticker.setDoorMalfunctionTimer();
 
         Component message = messageHandler.getMessage(Message.DOORS_MALFUNCTIONED, false, region.getId());
         BukkitAudiences audiences = messageHandler.getAudiences();
