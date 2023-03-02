@@ -31,7 +31,7 @@ public class EngineGameSessionTicker {
 
     public void reset() {
         settings = session.getSettings();
-        gameTick = settings.getMaxGameDuration();
+        gameTick = 0;
         doorVulnerabilityTick = 0;
         doorMalfunctionTick = 0;
     }
