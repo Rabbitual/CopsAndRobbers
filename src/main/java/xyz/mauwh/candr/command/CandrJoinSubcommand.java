@@ -1,8 +1,6 @@
 package xyz.mauwh.candr.command;
 
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.kyori.adventure.text.Component;
+import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
@@ -14,12 +12,10 @@ public class CandrJoinSubcommand {
 
     private final CopsAndRobbersEngine engine;
     private final MessageHandler messageHandler;
-    private final BukkitAudiences audiences;
 
     public CandrJoinSubcommand(@NotNull CopsAndRobbersEngine engine, @NotNull MessageHandler messageHandler) {
         this.engine = engine;
         this.messageHandler = messageHandler;
-        this.audiences = messageHandler.getAudiences();
     }
 
     /**
@@ -28,47 +24,33 @@ public class CandrJoinSubcommand {
      * @param args - the arguments this command was issued with
      */
     public void execute(@NotNull Player player, @NotNull String[] args) {
-        Audience playerAudience = audiences.player(player);
         String[] ids = engine.getSessionIDsAsStringArray();
         String joinedIDs = String.join("|", ids);
-        Component usage = messageHandler.getMessage(Message.CANDR_COMMAND_USAGE, true, joinedIDs);
-
         if (args.length < 2) {
-            playerAudience.sendMessage(usage);
+            messageHandler.sendMessage(player, Message.CANDR_COMMAND_USAGE, true, joinedIDs);
             return;
         }
 
         String strId = args[1];
-        GameSession session;
-        try {
+        GameSession session = null;
+        if (NumberUtils.isDigits(strId)) {
             int id = Integer.parseInt(strId);
             session = engine.getSession(id);
-        } catch (IllegalArgumentException err) {
-            session = null;
         }
 
         if (session == null) {
-            Component noGameMessage = messageHandler.getMessage(Message.GAME_DOES_NOT_EXIST, true);
-            playerAudience.sendMessage(noGameMessage);
-            playerAudience.sendMessage(usage);
+            messageHandler.sendMessage(player, Message.GAME_DOES_NOT_EXIST, true);
             return;
-        }
-
-        if (!session.addRobber(player)) {
-            Component fullGameMessage = messageHandler.getMessage(Message.GAME_CURRENTLY_FULL, true);
-            playerAudience.sendMessage(fullGameMessage);
+        } else if (!session.addRobber(player)) {
+            messageHandler.sendMessage(player, Message.GAME_CURRENTLY_FULL, true);
             return;
         }
 
         session.teleportRobberToCell(player);
-        Component message = messageHandler.getMessage(Message.JOINED_GAME, true, strId);
-        playerAudience.sendMessage(message);
-        if (session.hasMaxAllowedCops()) {
-            return;
+        messageHandler.sendMessage(player, Message.JOINED_GAME, true, strId);
+        if (!session.hasMaxAllowedCops()) {
+            messageHandler.sendMessage(player, Message.JAIL_COULD_USE_COPS, true);
         }
-
-        Component copsMessage = messageHandler.getMessage(Message.JAIL_COULD_USE_COPS, true);
-        playerAudience.sendMessage(copsMessage);
     }
 
 }

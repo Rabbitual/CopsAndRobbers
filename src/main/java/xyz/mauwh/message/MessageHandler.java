@@ -68,7 +68,8 @@ public final class MessageHandler {
 
         Component result = miniMessage.deserialize(replaced);
         if (prefixed) {
-            result = Component.text().append(getMessage(Message.PREFIX, false)).append(result).build();
+            Component prefix = getMessage(Message.PREFIX, false);
+            result = Component.text().append(prefix, result).build();
         }
         return result;
     }
@@ -80,6 +81,10 @@ public final class MessageHandler {
     public void sendMessage(@NotNull Audience audience, @NotNull Message message, boolean prefixed, Object... args) {
         Component component = getMessage(message, prefixed, args);
         audience.sendMessage(component);
+    }
+
+    public void broadcast(@NotNull Message message, boolean prefixed, Object... args) {
+        sendMessage(audiences.all(), message, prefixed, args);
     }
 
 }

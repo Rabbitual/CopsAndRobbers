@@ -1,8 +1,5 @@
 package xyz.mauwh.candr.command;
 
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,24 +24,20 @@ public class CandrCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        BukkitAudiences audiences = messageHandler.getAudiences();
-        Audience senderAudience = audiences.sender(sender);
         if (!engine.isActive()) {
-            Component engineHaltedMessage = messageHandler.getMessage(Message.ENGINE_IS_HALTED, true);
-            senderAudience.sendMessage(engineHaltedMessage);
+            messageHandler.sendMessage(sender, Message.ENGINE_IS_HALTED, true);
             return true;
         }
 
         if (!(sender instanceof Player)) {
-            Component message = messageHandler.getMessage(Message.PLAYERS_ONLY_COMMAND, true);
-            senderAudience.sendMessage(message);
+            messageHandler.sendMessage(sender, Message.PLAYERS_ONLY_COMMAND, true);
             return true;
         }
 
         String[] ids = engine.getSessionIDsAsStringArray();
-        Component helpMessage = messageHandler.getMessage(Message.CANDR_COMMAND_USAGE, true, String.join("|", ids));
+        String joinedIDs = String.join("|", ids);
         if (args.length == 0) {
-            senderAudience.sendMessage(helpMessage);
+            messageHandler.sendMessage(sender, Message.CANDR_COMMAND_USAGE, true, joinedIDs);
             return true;
         }
 
@@ -53,7 +46,7 @@ public class CandrCommand implements CommandExecutor {
         switch (subcommand) {
             case "leave", "quit" -> executeLeaveCommand(player);
             case "join" -> joinSubcommand.execute(player, args);
-            default -> senderAudience.sendMessage(helpMessage);
+            default -> messageHandler.sendMessage(sender, Message.CANDR_COMMAND_USAGE, true, joinedIDs);
         }
 
         return true;
@@ -64,32 +57,23 @@ public class CandrCommand implements CommandExecutor {
      * @param player - the player leaving the game
      */
     private void executeLeaveCommand(@NotNull Player player) {
-        BukkitAudiences audiences = messageHandler.getAudiences();
         GameSession session = engine.getGameSession(player);
-        Audience playerAudience = audiences.player(player);
         if (session == null) {
-            Component noGameMessage = messageHandler.getMessage(Message.GAME_DOES_NOT_EXIST, true);
-            playerAudience.sendMessage(noGameMessage);
+            messageHandler.sendMessage(player, Message.GAME_DOES_NOT_EXIST, true);
             return;
         }
 
         session.teleportPlayerToLobby(player);
-
         int id = session.getRegion().getId();
-        Component leftGameMessage = messageHandler.getMessage(Message.LEFT_GAME, true, id);
-
-        playerAudience.sendMessage(leftGameMessage);
+        messageHandler.sendMessage(player, Message.LEFT_GAME, true, id);
         if (session.removeRobber(player)) {
             return;
         }
 
         boolean needsReplacementCop = session.removeCop(player) && !session.hasMaxAllowedCops();
-        if (!needsReplacementCop) {
-            return;
+        if (needsReplacementCop) {
+            messageHandler.broadcast(Message.COP_RETIRED, true, id);
         }
-
-        Component copRetiredMessage = messageHandler.getMessage(Message.COP_RETIRED, true, id);
-        audiences.all().sendMessage(copRetiredMessage);
     }
 
 }
