@@ -23,6 +23,7 @@ public enum Message {
     FIRST_COPS_SELECTED_2("first-cops-selected-2"),
     FIRST_COPS_SELECTED_3("first-cops-selected-3"),
     COP_RETIRED("cop-retired"),
+    PRISON_ACCESS_GRANTED("prison-access-granted"),
     REPORT_BUGS("report-bugs"),
     VULNERABILITY_DETECTED("vulnerability-detected"),
     DOORS_MALFUNCTIONED("doors-malfunctioned"),
