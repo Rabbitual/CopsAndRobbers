@@ -3,7 +3,6 @@ package xyz.mauwh.candr.game;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,13 +45,13 @@ public class GameRegion {
         return maxPos.clone();
     }
 
-    @Nullable
+    @NotNull
     public Location getCopSpawnPoint() {
-        return copSpawnPoint == null ? null : copSpawnPoint.clone();
+        return copSpawnPoint.clone();
     }
 
-    public void setCopSpawnPoint(@Nullable Location location) {
-        this.copSpawnPoint = location == null ? null : location.clone();
+    public void setCopSpawnPoint(@NotNull Location location) {
+        this.copSpawnPoint = location.clone();
     }
 
     @NotNull

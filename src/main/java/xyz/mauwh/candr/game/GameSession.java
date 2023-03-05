@@ -181,17 +181,14 @@ public class GameSession {
     public void endGame(@Nullable Player winner, boolean broadcast) {
         BukkitAudiences audiences = messageHandler.getAudiences();
         if (winner == null && broadcast) {
-            Component message = messageHandler.getMessage(Message.NO_ESCAPEES, true, region.getId());
-            audiences.all().sendMessage(message);
+            messageHandler.broadcast(Message.NO_ESCAPEES, true, region.getId());
         } else if (broadcast) {
-            Component message = messageHandler.getMessage(Message.ROBBER_ESCAPED, true, winner.getName(), region.getId());
-            audiences.all().sendMessage(message);
+            messageHandler.broadcast(Message.ROBBER_ESCAPED, true, winner.getName(), region.getId());
         }
-        for (Player player : getPlayers()) {
-            teleportPlayerToLobby(player);
-            removeCop(player);
-            removeRobber(player);
-        }
+        getPlayers().forEach(this::teleportPlayerToLobby);
+        cops.clear();
+        robbers.clear();
+        prisonAccessGrantees.clear();
         restoreDoors();
     }
 
@@ -252,17 +249,7 @@ public class GameSession {
     }
 
     public void teleportCopToMainRoom(@NotNull Player player) {
-        Location copSpawn = region.getCopSpawnPoint();
-        if (copSpawn == null) {
-            Audience audience = messageHandler.getAudiences().player(player);
-            Component prefix = messageHandler.getMessage(Message.PREFIX, false);
-            Component message = Component.text("Unable to teleport to the jail main room, this is most likely an administrator error", NamedTextColor.RED);
-            Component prefixed = Component.text().append(prefix).append(message).build();
-            audience.sendMessage(prefixed);
-//            audience.sendMessage(messageHandler.getMessage(Message.MAIN_ROOM_NOT_FOUND, true));
-            return;
-        }
-        player.teleport(copSpawn);
+        player.teleport(region.getCopSpawnPoint());
     }
 
     public void teleportPlayerToLobby(@NotNull Player player) {
