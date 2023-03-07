@@ -35,6 +35,7 @@ public class GameSession {
     private final Set<Player> cops;
     private final Set<Player> robbers;
     private final Set<Player> copApplicants;
+    private final Set<Player> prisonAccessGrantees;
     private DoorState doorState = DoorState.SECURE;
 
     public GameSession(@NotNull CopsAndRobbersEngine engine, @NotNull GameRegion region) {
@@ -45,6 +46,7 @@ public class GameSession {
         this.cops = new HashSet<>();
         this.robbers = new HashSet<>();
         this.copApplicants = new HashSet<>();
+        this.prisonAccessGrantees = new HashSet<>();
     }
 
     @NotNull
@@ -121,6 +123,18 @@ public class GameSession {
         return List.copyOf(copApplicants);
     }
 
+    public boolean isPrisonAccessGrantee(@NotNull Player player) {
+        return prisonAccessGrantees.contains(player);
+    }
+
+    public boolean addPrisonAccessGrantee(@NotNull Player player) {
+        return isRobber(player) && prisonAccessGrantees.add(player);
+    }
+
+    public void removePrisonAccessGrantee(@NotNull Player player) {
+        prisonAccessGrantees.remove(player);
+    }
+
     public boolean isPlayer(@NotNull Player player) {
         return isRobber(player) || isCop(player);
     }
@@ -179,7 +193,6 @@ public class GameSession {
     }
 
     public void endGame(@Nullable Player winner, boolean broadcast) {
-        BukkitAudiences audiences = messageHandler.getAudiences();
         if (winner == null && broadcast) {
             messageHandler.broadcast(Message.NO_ESCAPEES, true, region.getId());
         } else if (broadcast) {

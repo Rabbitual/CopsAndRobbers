@@ -11,6 +11,7 @@ import xyz.mauwh.candr.command.CopsCommand;
 import xyz.mauwh.candr.command.OpenCellsCommand;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
+import xyz.mauwh.candr.listener.PrisonAccessHandler;
 import xyz.mauwh.message.MessageHandler;
 
 import java.io.*;
@@ -43,6 +44,8 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
         getCommand("candr").setExecutor(new CandrCommand(engine));
         getCommand("cops").setExecutor(new CopsCommand(engine));
         getCommand("open").setExecutor(new OpenCellsCommand(engine));
+
+        getServer().getPluginManager().registerEvents(new PrisonAccessHandler(engine), this);
     }
 
     @NotNull
