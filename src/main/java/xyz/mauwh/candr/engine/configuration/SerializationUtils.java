@@ -8,10 +8,7 @@ import xyz.mauwh.candr.region.RegionNode;
 
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static xyz.mauwh.message.ColoredConsoleStringBuilder.builder;
 
 public final class SerializationUtils {
 
@@ -60,8 +57,8 @@ public final class SerializationUtils {
                 Location location = SerializationUtils.deserializeLocation(world, serializedLocation.get());
                 deserialized.add(location);
             } catch (IllegalArgumentException err) {
-                builder().red(err.getMessage()).post(logger, Level.WARNING);
-                builder().yellow(warningMessage).post(logger, Level.WARNING);
+                logger.warning(err.getMessage());
+                logger.warning(warningMessage);
             }
         });
         return deserialized;
@@ -81,8 +78,8 @@ public final class SerializationUtils {
                 RegionNode node = function.apply(world, e);
                 deserialized.add(node);
             } catch (IllegalArgumentException err) {
-                builder().red(err.getMessage()).post(logger, Level.WARNING);
-                builder().yellow(warningMessage).post(logger, Level.WARNING);
+                logger.warning(err.getMessage());
+                logger.warning(warningMessage);
             }
         });
         return deserialized;

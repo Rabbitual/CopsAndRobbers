@@ -15,24 +15,27 @@ import xyz.mauwh.candr.listener.PrisonAccessHandler;
 import xyz.mauwh.message.MessageHandler;
 
 import java.io.*;
-import java.util.logging.Level;
-
-import static xyz.mauwh.message.ColoredConsoleStringBuilder.builder;
+import java.util.logging.Logger;
 
 public final class CopsAndRobbersPlugin extends JavaPlugin {
 
+    private final Logger logger;
+
+    public CopsAndRobbersPlugin() {
+        this.logger = new CopsAndRobbersLogger(this);
+    }
+
     @Override
     public void onEnable() {
-        EngineSettings settings = new EngineSettings(getLogger());
+        EngineSettings settings = new EngineSettings(logger);
         YamlConfiguration config = (YamlConfiguration)getConfig();
-        loadAndSetDefaults("config.yml", config);
         settings.load(config, true);
 
         BukkitAudiences audiences = BukkitAudiences.create(this);
         MessageHandler messageHandler = new MessageHandler(audiences, MiniMessage.miniMessage());
         YamlConfiguration messagesConfig = loadConfig("messages.yml");
         if (!loadAndSetDefaults("messages.yml", messagesConfig)) {
-            builder().red("Unable to load resource messages.yml").post(getLogger(), Level.SEVERE);
+            logger.severe("Unable to load resource messages.yml");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -83,8 +86,14 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
         if (command != null) {
             return command;
         }
-        builder().red("Fatal exception! No command found with name '" + name + "' (this is most likely a developer error!)").post(getLogger(), Level.SEVERE);
+        logger.severe("Fatal exception! No command found with name '" + name + "' (this is most likely a developer error!)");
         throw new IllegalArgumentException();
+    }
+
+    @Override
+    @NotNull
+    public Logger getLogger() {
+        return logger;
     }
 
 }

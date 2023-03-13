@@ -17,10 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static xyz.mauwh.message.ColoredConsoleStringBuilder.builder;
 
 public class CopsAndRobbersEngine {
 
@@ -101,7 +98,7 @@ public class CopsAndRobbersEngine {
         }).forEach(session -> {
             int id = session.getRegion().getId();
             if (sessions.containsKey(id)) {
-                builder().yellow("Unable to load region: game region with id '" + id + "' already exists").reset().post(logger, Level.WARNING);
+                logger.warning("Unable to load region: game region with id '" + id + "' already exists");
                 return;
             }
             sessions.put(id, session);

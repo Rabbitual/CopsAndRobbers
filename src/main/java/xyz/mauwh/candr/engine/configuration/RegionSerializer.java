@@ -10,10 +10,7 @@ import xyz.mauwh.candr.region.RegionNode;
 import xyz.mauwh.candr.region.TeleportNode;
 
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static xyz.mauwh.message.ColoredConsoleStringBuilder.builder;
 
 public class RegionSerializer {
 
@@ -52,8 +49,11 @@ public class RegionSerializer {
         List<Location> robberSpawnPoints = SerializationUtils.deserializeLocationList(world, robberSpawnPointsMap, logger, "Skipping invalid robber spawn point (id: " + id + ")");
         List<Location> doorLocations = SerializationUtils.deserializeLocationList(world, doorLocationsMap, logger, "Skipping invalid door location (id: " + id + ")");
 
-        checkArgumentSafely(!robberSpawnPoints.isEmpty(), "Missing robber spawn points, expected behavior may be altered (id: " + id + ")");
-        checkArgumentSafely(!doorLocations.isEmpty(), "Missing door locations, expected behavior may be altered (id: " + id + ")");
+        if (!robberSpawnPoints.isEmpty()) {
+            logger.warning("Missing robber spawn points, expected behavior may be altered (id: " + id + ")");
+        } else if (!doorLocations.isEmpty()) {
+            logger.warning("Missing door locations, expected behavior may be altered (id: " + id + ")");
+        }
 
         List<Map<?, ?>> accessNodesMapList = SerializationUtils.<List<Map<?, ?>>>castDubiously(serializedRegion.get("access-nodes")).orElse(Collections.emptyList());
         List<Map<?, ?>> teleportNodesMapList = SerializationUtils.<List<Map<?, ?>>>castDubiously(serializedRegion.get("teleport-nodes")).orElse(Collections.emptyList());
@@ -96,17 +96,6 @@ public class RegionSerializer {
         return SerializationUtils.castDubiously(serializedRegion.get(path), Map.class)
                 .map(value -> SerializationUtils.deserializeLocation(world, value))
                 .orElseThrow(() -> new IllegalArgumentException("Unable to deserialize location from path '" + path + "'"));
-    }
-
-    /**
-     * Logs a warning if the provided expression evaluates to false
-     * @param expression - the expression to assert as true
-     * @param message - the warning message used if the provided expression evaluates to false
-     */
-    private void checkArgumentSafely(boolean expression, String message) {
-        if (!expression) {
-            builder().yellow(message).post(logger, Level.WARNING);
-        }
     }
 
 }

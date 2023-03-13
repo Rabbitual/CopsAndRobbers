@@ -9,10 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static xyz.mauwh.message.ColoredConsoleStringBuilder.builder;
 
 /**
  * A container for all settings relating to the Cops and Robber Engine's general functionality. These settings apply to
@@ -59,7 +56,7 @@ public class EngineSettings {
             if (logSettings) {
                 logSettings();
             }
-            builder().yellow("Unable to set lobby spawn: no lobby configured").reset().post(logger, Level.WARNING);
+            logger.warning("Unable to set lobby spawn: no lobby configured");
             return;
         }
 
@@ -71,7 +68,7 @@ public class EngineSettings {
             if (logSettings) {
                 logSettings();
             }
-            builder().yellow("Unable to set lobby spawn: invalid coordinates").reset().post(logger, Level.WARNING);
+            logger.warning("Unable to set lobby spawn: invalid coordinates");
             return;
         }
 
@@ -80,7 +77,7 @@ public class EngineSettings {
             if (logSettings) {
                 logSettings();
             }
-            builder().yellow("Unable to set lobby: unable to find world with name '" + worldName + "'").reset().post(logger, Level.WARNING);
+            logger.warning("Unable to set lobby: unable to find world with name '" + worldName + "'");
             return;
         }
 
