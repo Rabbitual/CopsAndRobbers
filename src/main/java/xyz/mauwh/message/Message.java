@@ -13,6 +13,7 @@ public enum Message {
     GAME_DOES_NOT_EXIST("game-does-not-exist"),
     GAME_CURRENTLY_FULL("game-currently-full"),
     JOINED_GAME("joined-game"),
+    ALREADY_IN_GAME("already-in-game"),
     LEFT_GAME("left-game"),
     JAIL_COULD_USE_COPS("jail-could-use-cops"),
     ALREADY_A_COP("already-a-cop"),

@@ -1,9 +1,5 @@
 package xyz.mauwh.candr.game;
 
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -11,6 +7,7 @@ import org.bukkit.block.data.Openable;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.mauwh.candr.CopsAndRobbersLogger;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
 import xyz.mauwh.candr.engine.ticker.EngineGameSessionTicker;
@@ -19,9 +16,6 @@ import xyz.mauwh.message.MessageHandler;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.logging.Level;
-
-import static xyz.mauwh.message.ColoredConsoleStringBuilder.builder;
 
 public class GameSession {
 
@@ -65,7 +59,14 @@ public class GameSession {
     }
 
     public boolean addRobber(@NotNull Player player) {
-        return !isFull() && robbers.add(player);
+        if (isFull()) {
+            messageHandler.sendMessage(player, Message.GAME_CURRENTLY_FULL, true);
+            return false;
+        } else if (!robbers.add(player)) {
+            messageHandler.sendMessage(player, Message.ALREADY_IN_GAME, true);
+            return false;
+        }
+        return true;
     }
 
     public boolean removeRobber(@NotNull Player player) {
@@ -183,7 +184,7 @@ public class GameSession {
         }
         ticker.reset();
         active = true;
-        builder().green("Successfully started game (id: " + region.getId() + ")").reset().post(engine.getLogger(), Level.INFO);
+        logger.info("Successfully started game (id: " + region.getId() + ")");
     }
 
     public void tick() {
@@ -207,9 +208,7 @@ public class GameSession {
 
     public void makeDoorsVulnerable() {
         doorState = DoorState.VULNERABLE;
-        Component message = messageHandler.getMessage(Message.VULNERABILITY_DETECTED, false, region.getId());
-        BukkitAudiences audiences = messageHandler.getAudiences();
-        audiences.all().sendMessage(message);
+        messageHandler.broadcast(Message.VULNERABILITY_DETECTED, false, region.getId());
     }
 
     public void malfunctionDoors() {
@@ -220,10 +219,7 @@ public class GameSession {
         setDoorsOpen(true);
         doorState = DoorState.MALFUNCTIONING;
         ticker.setDoorMalfunctionTimer();
-
-        Component message = messageHandler.getMessage(Message.DOORS_MALFUNCTIONED, false, region.getId());
-        BukkitAudiences audiences = messageHandler.getAudiences();
-        audiences.all().sendMessage(message);
+        messageHandler.broadcast(Message.DOORS_MALFUNCTIONED, false, region.getId());
     }
 
     public void restoreDoors() {
@@ -249,9 +245,7 @@ public class GameSession {
     public void teleportRobberToCell(@NotNull Player player) {
         List<Location> cellLocations = region.getRobberSpawnPoints();
         if (cellLocations.isEmpty()) {
-            Component message = messageHandler.getMessage(Message.CELLS_NOT_FOUND, true);
-            Audience audience = messageHandler.getAudiences().player(player);
-            audience.sendMessage(message);
+            messageHandler.sendMessage(player, Message.CELLS_NOT_FOUND, true);
             return;
         }
 
@@ -268,8 +262,7 @@ public class GameSession {
     public void teleportPlayerToLobby(@NotNull Player player) {
         Location lobbySpawn = settings.getLobbySpawn();
         if (lobbySpawn == null) {
-            Audience audience = messageHandler.getAudiences().player(player);
-            audience.sendMessage(messageHandler.getMessage(Message.LOBBY_NOT_FOUND, true));
+            messageHandler.sendMessage(player, Message.LOBBY_NOT_FOUND, true);
             return;
         }
         player.teleport(lobbySpawn);

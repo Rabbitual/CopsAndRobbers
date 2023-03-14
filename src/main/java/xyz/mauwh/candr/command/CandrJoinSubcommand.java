@@ -42,7 +42,7 @@ public class CandrJoinSubcommand {
             messageHandler.sendMessage(player, Message.GAME_DOES_NOT_EXIST, true);
             return;
         } else if (!session.addRobber(player)) {
-            messageHandler.sendMessage(player, Message.GAME_CURRENTLY_FULL, true);
+            messageHandler.sendMessage(player, Message.ALREADY_IN_GAME, true);
             return;
         }
 
