@@ -62,18 +62,15 @@ public class GameSession {
     }
 
     public boolean setPlayerState(@NotNull Player player, PlayerState state) {
-        UUID playerUUID = player.getUniqueId();
-        PlayerState oldState = playerStates.get(playerUUID);
-        if (state == null || state == PlayerState.NOT_PLAYING) {
-            return playerStates.remove(playerUUID, oldState);
-        }
-        playerStates.put(player.getUniqueId(), state);
-        return state != oldState;
+        return state != playerStates.put(player.getUniqueId(), state);
     }
 
-    @NotNull
+    public boolean removePlayer(@NotNull Player player) {
+        return playerStates.remove(player.getUniqueId()) != null;
+    }
+
     public PlayerState getPlayerState(@NotNull Player player) {
-        return playerStates.getOrDefault(player.getUniqueId(), PlayerState.NOT_PLAYING);
+        return playerStates.get(player.getUniqueId());
     }
 
     @Deprecated
