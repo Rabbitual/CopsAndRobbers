@@ -26,10 +26,11 @@ public class GameSession {
     private EngineGameSessionTicker ticker;
     private boolean active;
 
-    private final Set<Player> cops;
-    private final Set<Player> robbers;
-    private final Set<Player> copApplicants;
-    private final Set<Player> prisonAccessGrantees;
+    private final Map<UUID, PlayerState> playerStates;
+    private final @Deprecated Set<Player> cops;
+    private final @Deprecated Set<Player> robbers;
+    private final @Deprecated Set<Player> copApplicants;
+    private final @Deprecated Set<Player> prisonAccessGrantees;
     private DoorState doorState = DoorState.SECURE;
 
     public GameSession(@NotNull CopsAndRobbersEngine engine, @NotNull GameRegion region) {
@@ -37,6 +38,8 @@ public class GameSession {
         this.settings = engine.getSettings();
         this.messageHandler = engine.getMessageHandler();
         this.region = region;
+        this.playerStates = new HashMap<>();
+        // old
         this.cops = new HashSet<>();
         this.robbers = new HashSet<>();
         this.copApplicants = new HashSet<>();
@@ -58,6 +61,22 @@ public class GameSession {
         return region;
     }
 
+    public boolean setPlayerState(@NotNull Player player, PlayerState state) {
+        UUID playerUUID = player.getUniqueId();
+        PlayerState oldState = playerStates.get(playerUUID);
+        if (state == null || state == PlayerState.NOT_PLAYING) {
+            return playerStates.remove(playerUUID, oldState);
+        }
+        playerStates.put(player.getUniqueId(), state);
+        return state != oldState;
+    }
+
+    @NotNull
+    public PlayerState getPlayerState(@NotNull Player player) {
+        return playerStates.getOrDefault(player.getUniqueId(), PlayerState.NOT_PLAYING);
+    }
+
+    @Deprecated
     public boolean addRobber(@NotNull Player player) {
         if (isFull()) {
             messageHandler.sendMessage(player, Message.GAME_CURRENTLY_FULL, true);
@@ -69,31 +88,38 @@ public class GameSession {
         return true;
     }
 
+    @Deprecated
     public boolean removeRobber(@NotNull Player player) {
         return robbers.remove(player);
     }
 
+    @Deprecated
     public boolean isRobber(@NotNull Player player) {
         return robbers.contains(player);
     }
 
+    @Deprecated
     @NotNull
     public Set<Player> getRobbers() {
         return Collections.unmodifiableSet(robbers);
     }
 
+    @Deprecated
     public void addCop(@NotNull Player player) {
         cops.add(player);
     }
 
+    @Deprecated
     public boolean removeCop(@NotNull Player player) {
         return cops.remove(player);
     }
 
+    @Deprecated
     public boolean isCop(@NotNull Player player) {
         return cops.contains(player);
     }
 
+    @Deprecated
     @NotNull
     public Set<Player> getCops() {
         return Collections.unmodifiableSet(cops);
@@ -124,14 +150,17 @@ public class GameSession {
         return List.copyOf(copApplicants);
     }
 
+    @Deprecated
     public boolean isPrisonAccessGrantee(@NotNull Player player) {
         return prisonAccessGrantees.contains(player);
     }
 
+    @Deprecated
     public boolean addPrisonAccessGrantee(@NotNull Player player) {
         return isRobber(player) && prisonAccessGrantees.add(player);
     }
 
+    @Deprecated
     public void removePrisonAccessGrantee(@NotNull Player player) {
         prisonAccessGrantees.remove(player);
     }
@@ -184,7 +213,7 @@ public class GameSession {
         }
         ticker.reset();
         active = true;
-        logger.info("Successfully started game (id: " + region.getId() + ")");
+        engine.getLogger().info("Successfully started game (id: " + region.getId() + ")");
     }
 
     public void tick() {
