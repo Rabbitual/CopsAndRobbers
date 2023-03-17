@@ -29,7 +29,7 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
     public void onEnable() {
         EngineSettings settings = new EngineSettings(logger);
         YamlConfiguration config = (YamlConfiguration)getConfig();
-        settings.load(config, true);
+        settings.load(config);
 
         BukkitAudiences audiences = BukkitAudiences.create(this);
         MessageHandler messageHandler = new MessageHandler(audiences, MiniMessage.miniMessage());

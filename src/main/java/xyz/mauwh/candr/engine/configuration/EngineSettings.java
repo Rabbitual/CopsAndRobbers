@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,55 +40,39 @@ public class EngineSettings {
      * Loads all configured settings from the provided {@link org.bukkit.configuration.file.YamlConfiguration}
      * @param configuration - the configuration to load the engine settings from
      */
-    public void load(@NotNull final YamlConfiguration configuration, boolean logSettings) {
-        minPlayersThreeCops = configuration.getInt("min-players-three-cops");
-        copItems = deserializeItemStackList(configuration, "cop-items");
-        robberItems = deserializeItemStackList(configuration, "robber-items");
-        minPlayersTwoCops = configuration.getInt("min-players-two-cops");
-        maxPlayers = configuration.getInt("max-players");
-        copsSelectionDelay = configuration.getInt("cops-selection-delay");
-        doorMalfunctionDuration = configuration.getInt("door-malfunction-duration");
+    public void load(@NotNull final YamlConfiguration configuration) {
+        copItems =                  deserializeItemStackList(configuration, "cop-items");
+        robberItems =               deserializeItemStackList(configuration, "robber-items");
+        minPlayersThreeCops =       configuration.getInt("min-players-three-cops");
+        minPlayersTwoCops =         configuration.getInt("min-players-two-cops");
+        maxPlayers =                configuration.getInt("max-players");
+        copsSelectionDelay =        configuration.getInt("cops-selection-delay");
+        doorMalfunctionDuration =   configuration.getInt("door-malfunction-duration");
         doorVulnerabilityDuration = configuration.getInt("door-vulnerability-duration");
         doorVulnerabilityInterval = configuration.getInt("door-vulnerability-interval");
-        doorVulnerabilityChance = configuration.getDouble("door-vulnerability-chance");
-        maxGameDuration = configuration.getInt("max-game-duration");
+        doorVulnerabilityChance =   configuration.getDouble("door-vulnerability-chance");
+        maxGameDuration =           configuration.getInt("max-game-duration");
 
         if (!configuration.isConfigurationSection("lobby-spawn")) {
-            if (logSettings) {
-                logSettings();
-            }
+            logSettings();
             logger.warning("Unable to set lobby spawn: no lobby configured");
             return;
         }
 
-        Object x = configuration.get("lobby-spawn.x");
-        Object y = configuration.get("lobby-spawn.y");
-        Object z = configuration.get("lobby-spawn.z");
-        Object worldName = configuration.get("lobby-spawn.world");
-        if (!(x instanceof Number && y instanceof Number && z instanceof Number)) {
-            if (logSettings) {
-                logSettings();
-            }
-            logger.warning("Unable to set lobby spawn: invalid coordinates");
-            return;
-        }
+        double x = NumberConversions.toDouble(configuration.get("lobby-spawn.x"));
+        double y = NumberConversions.toDouble(configuration.get("lobby-spawn.y"));
+        double z = NumberConversions.toDouble(configuration.get("lobby-spawn.z"));
+        String worldName = String.valueOf(configuration.get("lobby-spawn.world"));
 
-        World world = worldName == null ? null : Bukkit.getWorld(worldName.toString());
+        World world = worldName == null ? null : Bukkit.getWorld(worldName);
         if (world == null) {
-            if (logSettings) {
-                logSettings();
-            }
+            logSettings();
             logger.warning("Unable to set lobby: unable to find world with name '" + worldName + "'");
             return;
         }
 
-        double xDbl = ((Number)x).doubleValue();
-        double yDbl = ((Number)y).doubleValue();
-        double zDbl = ((Number)z).doubleValue();
-        lobbySpawn = new Location(world, xDbl, yDbl, zDbl);
-        if (logSettings) {
-            logSettings();
-        }
+        lobbySpawn = new Location(world, x, y, z);
+        logSettings();
     }
 
     /**
@@ -95,27 +80,18 @@ public class EngineSettings {
      */
     private void logSettings() {
         logger.info("-------- Cops And Robbers Engine Settings --------");
-        logger.info("Max game duration: " + maxGameDuration);
-        logger.info("Cops selection delay: " + copsSelectionDelay);
-        logger.info("Door vulnerability chance: " + (doorVulnerabilityChance * 100) + "%");
-        logger.info("Door vulnerability interval: " + doorVulnerabilityInterval);
-        logger.info("Door vulnerability duration: " + doorVulnerabilityDuration);
-        logger.info("Door malfunction duration: " + doorMalfunctionDuration);
-        logger.info("Max players: " + maxPlayers);
-        logger.info("Min players two cops: " + minPlayersTwoCops);
-        logger.info("Min players three cops: " + minPlayersThreeCops);
-        logger.info("Cop items: [" + String.join(" / ", copItems.stream().map(Object::toString).toArray(String[]::new)) + "]");
-        logger.info("Robber items: [" + String.join(" / ", robberItems.stream().map(Object::toString).toArray(String[]::new)) + "]");
-
-        String locationString;
-        if (lobbySpawn == null) {
-            locationString = "null";
-        } else {
-            String worldName = Objects.requireNonNull(lobbySpawn.getWorld()).getName();
-            locationString = String.format("world: %s, x: %s, y: %s, z: %s", worldName, lobbySpawn.getX(), lobbySpawn.getY(), lobbySpawn.getZ());
-        }
-
-        logger.info("Lobby spawnpoint: [" + locationString + "]");
+        logger.info("Max game duration: " +             maxGameDuration);
+        logger.info("Cops selection delay: " +          copsSelectionDelay);
+        logger.info("Door vulnerability chance: " +     (doorVulnerabilityChance * 100) + "%");
+        logger.info("Door vulnerability interval: " +   doorVulnerabilityInterval);
+        logger.info("Door vulnerability duration: " +   doorVulnerabilityDuration);
+        logger.info("Door malfunction duration: " +     doorMalfunctionDuration);
+        logger.info("Max players: " +                   maxPlayers);
+        logger.info("Min players two cops: " +          minPlayersTwoCops);
+        logger.info("Min players three cops: " +        minPlayersThreeCops);
+        logger.info("Cop items: " +                     copItems);
+        logger.info("Robber items: " +                  robberItems);
+        logger.info("Lobby spawnpoint: " +              lobbySpawn);
     }
 
     /**
