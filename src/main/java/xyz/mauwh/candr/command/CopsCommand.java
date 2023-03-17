@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.game.GameSession;
+import xyz.mauwh.candr.game.PlayerState;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
@@ -36,7 +37,7 @@ public class CopsCommand implements CommandExecutor {
         Message message;
         if (session == null) {
             message = Message.IN_GAME_ONLY_COMMAND;
-        } else if (session.isCop(player)) {
+        } else if (session.getPlayerState(player) == PlayerState.COP) {
             message = Message.ALREADY_A_COP;
         } else if (session.hasMaxAllowedCops()) {
             message = Message.NOT_ACCEPTING_APPLICATIONS;

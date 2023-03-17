@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.game.GameSession;
+import xyz.mauwh.candr.game.PlayerState;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
@@ -66,12 +67,14 @@ public class CandrCommand implements CommandExecutor {
         session.teleportPlayerToLobby(player);
         int id = session.getRegion().getId();
         messageHandler.sendMessage(player, Message.LEFT_GAME, true, id);
-        if (session.removePlayer(player)) {
+
+        boolean wasRobber = session.getPlayerState(player).isRobber();
+        session.removePlayer(player);
+        if (wasRobber) {
             return;
         }
 
-        boolean needsReplacementCop = session.removeCop(player) && !session.hasMaxAllowedCops();
-        if (needsReplacementCop) {
+        if (!session.hasMaxAllowedCops()) {
             messageHandler.broadcast(Message.COP_RETIRED, true, id);
         }
     }

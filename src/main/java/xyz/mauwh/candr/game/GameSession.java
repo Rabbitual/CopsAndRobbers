@@ -27,7 +27,6 @@ public class GameSession {
     private boolean active;
 
     private final Map<UUID, PlayerState> playerStates;
-    private final @Deprecated Set<Player> cops;
     private final @Deprecated Set<Player> copApplicants;
     private final @Deprecated Set<Player> prisonAccessGrantees;
     private DoorState doorState = DoorState.SECURE;
@@ -39,7 +38,6 @@ public class GameSession {
         this.region = region;
         this.playerStates = new HashMap<>();
         // old
-        this.cops = new HashSet<>();
         this.copApplicants = new HashSet<>();
         this.prisonAccessGrantees = new HashSet<>();
     }
@@ -71,34 +69,15 @@ public class GameSession {
         return playerStates.get(player.getUniqueId());
     }
 
-    @Deprecated
-    public void addCop(@NotNull Player player) {
-        cops.add(player);
-    }
-
-    @Deprecated
-    public boolean removeCop(@NotNull Player player) {
-        return cops.remove(player);
-    }
-
-    @Deprecated
-    public boolean isCop(@NotNull Player player) {
-        return cops.contains(player);
-    }
-
-    @Deprecated
-    @NotNull
-    public Set<Player> getCops() {
-        return Collections.unmodifiableSet(cops);
-    }
-
     public boolean hasMaxAllowedCops() {
+        long cops = playerStates.entrySet().stream()
+                .filter(entry -> entry.getValue() == PlayerState.COP)
+                .count();
         if (getPlayerCount() >= settings.getMinPlayersThreeCops()) {
-            return cops.size() >= 3;
+            return cops >= 3;
         } else if (getPlayerCount() >= settings.getMinPlayersTwoCops()) {
-            return cops.size() >= 2;
-        }
-        return cops.size() != 0;
+            return cops >= 2;
+        } else return cops == 1;
     }
 
     public boolean addCopApplicant(@NotNull Player player) {
@@ -200,7 +179,6 @@ public class GameSession {
             }
         });
 
-        cops.clear();
         playerStates.clear();
         prisonAccessGrantees.clear();
         restoreDoors();

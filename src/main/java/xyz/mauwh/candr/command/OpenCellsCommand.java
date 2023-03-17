@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.game.DoorState;
 import xyz.mauwh.candr.game.GameSession;
+import xyz.mauwh.candr.game.PlayerState;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
@@ -35,7 +36,7 @@ public class OpenCellsCommand implements CommandExecutor {
             return true;
         }
 
-        if (session.isCop(player)) {
+        if (session.getPlayerState(player) == PlayerState.COP) {
             messageHandler.sendMessage(player, Message.ROBBERS_ONLY_COMMAND, true);
         } else if (session.getDoorState() != DoorState.VULNERABLE) {
             messageHandler.sendMessage(player, Message.NOT_TIME_FOR_COMMAND, true);
