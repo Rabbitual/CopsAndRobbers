@@ -3,6 +3,7 @@ package xyz.mauwh.candr.engine.configuration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.game.GameRegion;
 import xyz.mauwh.candr.region.AccessNode;
@@ -28,14 +29,13 @@ public class RegionSerializer {
      */
     @NotNull
     public GameRegion deserialize(@NotNull Map<?, ?> serializedRegion) throws IllegalArgumentException {
-        var idRaw = serializedRegion.get("id");
-        if (!(idRaw instanceof Integer)) {
-            throw new IllegalArgumentException(String.format("Invalid region id '%s', must be an integer", idRaw));
+        int id = NumberConversions.toInt(serializedRegion.get("id"));
+        if (id <= 0) {
+            throw new IllegalArgumentException("Invalid region id, must be an integer greater than 1");
         }
 
-        int id = (int)idRaw;
         String worldName = String.valueOf(serializedRegion.get("world"));
-        World world = worldName == null ? null : Bukkit.getWorld(worldName);
+        World world = Bukkit.getWorld(worldName);
         if (world == null) {
             throw new IllegalArgumentException(String.format("Invalid region world name '%s' (id: %s)", worldName, id));
         }
