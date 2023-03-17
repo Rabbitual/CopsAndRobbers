@@ -29,7 +29,7 @@ public class TeleportNode extends RegionNode {
 
     @Override
     public boolean canBeUsed(@NotNull GameSession session, @NotNull Player player, @NotNull Location usedBlockLocation, @NotNull Action action) {
-        return super.canBeUsed(session, player, usedBlockLocation, action) && session.isPrisonAccessGrantee(player);
+        return super.canBeUsed(session, player, usedBlockLocation, action) && session.getPlayerState(player).hasPrisonAccess();
     }
 
     @NotNull

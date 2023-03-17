@@ -7,6 +7,7 @@ import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.configuration.SerializationUtils;
 import xyz.mauwh.candr.game.GameSession;
+import xyz.mauwh.candr.game.PlayerState;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
@@ -21,7 +22,8 @@ public class AccessNode extends RegionNode {
 
     @Override
     public void handle(@NotNull GameSession session, @NotNull Player player, @NotNull MessageHandler messageHandler) {
-        if (session.addPrisonAccessGrantee(player)) {
+        if (session.getPlayerState(player).isRobber()) {
+            session.setPlayerState(player, PlayerState.ROBBER_UNRESTRICTED);
             messageHandler.sendMessage(player, Message.PRISON_ACCESS_GRANTED, true);
         }
     }

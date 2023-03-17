@@ -7,7 +7,6 @@ import org.bukkit.block.data.Openable;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.mauwh.candr.CopsAndRobbersLogger;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
 import xyz.mauwh.candr.engine.ticker.EngineGameSessionTicker;
@@ -27,8 +26,7 @@ public class GameSession {
     private boolean active;
 
     private final Map<UUID, PlayerState> playerStates;
-    private final @Deprecated Set<Player> copApplicants;
-    private final @Deprecated Set<Player> prisonAccessGrantees;
+    private final Set<Player> copApplicants;
     private DoorState doorState = DoorState.SECURE;
 
     public GameSession(@NotNull CopsAndRobbersEngine engine, @NotNull GameRegion region) {
@@ -37,9 +35,7 @@ public class GameSession {
         this.messageHandler = engine.getMessageHandler();
         this.region = region;
         this.playerStates = new HashMap<>();
-        // old
         this.copApplicants = new HashSet<>();
-        this.prisonAccessGrantees = new HashSet<>();
     }
 
     @NotNull
@@ -94,21 +90,6 @@ public class GameSession {
     @NotNull
     public List<Player> getCopApplicants() {
         return List.copyOf(copApplicants);
-    }
-
-    @Deprecated
-    public boolean isPrisonAccessGrantee(@NotNull Player player) {
-        return prisonAccessGrantees.contains(player);
-    }
-
-    @Deprecated
-    public boolean addPrisonAccessGrantee(@NotNull Player player) {
-        return prisonAccessGrantees.add(player);
-    }
-
-    @Deprecated
-    public void removePrisonAccessGrantee(@NotNull Player player) {
-        prisonAccessGrantees.remove(player);
     }
 
     public boolean isPlayer(@NotNull Player player) {
@@ -180,7 +161,6 @@ public class GameSession {
         });
 
         playerStates.clear();
-        prisonAccessGrantees.clear();
         restoreDoors();
     }
 
