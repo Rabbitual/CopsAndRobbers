@@ -1,6 +1,7 @@
 package xyz.mauwh.candr.engine.ticker;
 
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
@@ -13,6 +14,7 @@ import xyz.mauwh.message.MessageHandler;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EngineGameSessionTicker {
@@ -104,7 +106,7 @@ public class EngineGameSessionTicker {
     }
 
     private Player selectRandomNewCop() {
-        List<Player> copApplicants = session.getCopApplicants();
+        List<UUID> copApplicants = session.getCopApplicants();
         if (copApplicants.isEmpty()) {
             return null;
         }
@@ -116,7 +118,9 @@ public class EngineGameSessionTicker {
             index = random.nextInt(size);
         }
 
-        Player newCop = copApplicants.get(index);
+        UUID uuid = copApplicants.get(index);
+        Player newCop = Bukkit.getPlayer(uuid);
+        Objects.requireNonNull(newCop, "Attempted to select null as new cop");
         session.setPlayerState(newCop, PlayerState.COP);
         session.removeCopApplicant(newCop);
         session.teleportCopToMainRoom(newCop);

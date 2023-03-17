@@ -26,7 +26,7 @@ public class GameSession {
     private boolean active;
 
     private final Map<UUID, PlayerState> playerStates;
-    private final Set<Player> copApplicants;
+    private final Set<UUID> copApplicants;
     private DoorState doorState = DoorState.SECURE;
 
     public GameSession(@NotNull CopsAndRobbersEngine engine, @NotNull GameRegion region) {
@@ -78,17 +78,17 @@ public class GameSession {
 
     public boolean addCopApplicant(@NotNull Player player) {
         if (isPlayer(player) && !hasMaxAllowedCops()) {
-            return copApplicants.add(player);
+            return copApplicants.add(player.getUniqueId());
         }
         return false;
     }
 
     public void removeCopApplicant(@NotNull Player player) {
-        copApplicants.remove(player);
+        copApplicants.remove(player.getUniqueId());
     }
 
     @NotNull
-    public List<Player> getCopApplicants() {
+    public List<UUID> getCopApplicants() {
         return List.copyOf(copApplicants);
     }
 
