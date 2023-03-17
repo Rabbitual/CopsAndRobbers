@@ -63,16 +63,13 @@ public class EngineSettings {
         double y = NumberConversions.toDouble(configuration.get("lobby-spawn.y"));
         double z = NumberConversions.toDouble(configuration.get("lobby-spawn.z"));
         String worldName = String.valueOf(configuration.get("lobby-spawn.world"));
+        World world = Bukkit.getWorld(worldName);
+        lobbySpawn = world == null ? null : new Location(world, x, y, z);
 
-        World world = worldName == null ? null : Bukkit.getWorld(worldName);
-        if (world == null) {
-            logSettings();
-            logger.warning("Unable to set lobby: unable to find world with name '" + worldName + "'");
-            return;
-        }
-
-        lobbySpawn = new Location(world, x, y, z);
         logSettings();
+        if (lobbySpawn == null) {
+            logger.warning("Unable to set lobby: unable to find world with name '" + worldName + "'");
+        }
     }
 
     /**
