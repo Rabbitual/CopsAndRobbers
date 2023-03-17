@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.game.GameSession;
+import xyz.mauwh.candr.game.PlayerState;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
@@ -41,11 +42,12 @@ public class CandrJoinSubcommand {
         if (session == null) {
             messageHandler.sendMessage(player, Message.GAME_DOES_NOT_EXIST, true);
             return;
-        } else if (!session.addRobber(player)) {
+        } else if (session.isPlayer(player)) {
             messageHandler.sendMessage(player, Message.ALREADY_IN_GAME, true);
             return;
         }
 
+        session.setPlayerState(player, PlayerState.ROBBER);
         session.teleportRobberToCell(player);
         messageHandler.sendMessage(player, Message.JOINED_GAME, true, strId);
         if (!session.hasMaxAllowedCops()) {

@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
 import xyz.mauwh.candr.game.DoorState;
 import xyz.mauwh.candr.game.GameSession;
+import xyz.mauwh.candr.game.PlayerState;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
@@ -116,8 +117,7 @@ public class EngineGameSessionTicker {
         }
 
         Player newCop = copApplicants.get(index);
-        session.removeRobber(newCop);
-        session.addCop(newCop);
+        session.setPlayerState(newCop, PlayerState.COP);
         session.removeCopApplicant(newCop);
         session.teleportCopToMainRoom(newCop);
         return newCop;

@@ -66,7 +66,7 @@ public class CandrCommand implements CommandExecutor {
         session.teleportPlayerToLobby(player);
         int id = session.getRegion().getId();
         messageHandler.sendMessage(player, Message.LEFT_GAME, true, id);
-        if (session.removeRobber(player)) {
+        if (session.removePlayer(player)) {
             return;
         }
 

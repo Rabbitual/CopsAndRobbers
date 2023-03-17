@@ -28,7 +28,6 @@ public class GameSession {
 
     private final Map<UUID, PlayerState> playerStates;
     private final @Deprecated Set<Player> cops;
-    private final @Deprecated Set<Player> robbers;
     private final @Deprecated Set<Player> copApplicants;
     private final @Deprecated Set<Player> prisonAccessGrantees;
     private DoorState doorState = DoorState.SECURE;
@@ -41,7 +40,6 @@ public class GameSession {
         this.playerStates = new HashMap<>();
         // old
         this.cops = new HashSet<>();
-        this.robbers = new HashSet<>();
         this.copApplicants = new HashSet<>();
         this.prisonAccessGrantees = new HashSet<>();
     }
@@ -71,34 +69,6 @@ public class GameSession {
 
     public PlayerState getPlayerState(@NotNull Player player) {
         return playerStates.get(player.getUniqueId());
-    }
-
-    @Deprecated
-    public boolean addRobber(@NotNull Player player) {
-        if (isFull()) {
-            messageHandler.sendMessage(player, Message.GAME_CURRENTLY_FULL, true);
-            return false;
-        } else if (!robbers.add(player)) {
-            messageHandler.sendMessage(player, Message.ALREADY_IN_GAME, true);
-            return false;
-        }
-        return true;
-    }
-
-    @Deprecated
-    public boolean removeRobber(@NotNull Player player) {
-        return robbers.remove(player);
-    }
-
-    @Deprecated
-    public boolean isRobber(@NotNull Player player) {
-        return robbers.contains(player);
-    }
-
-    @Deprecated
-    @NotNull
-    public Set<Player> getRobbers() {
-        return Collections.unmodifiableSet(robbers);
     }
 
     @Deprecated
@@ -154,7 +124,7 @@ public class GameSession {
 
     @Deprecated
     public boolean addPrisonAccessGrantee(@NotNull Player player) {
-        return isRobber(player) && prisonAccessGrantees.add(player);
+        return prisonAccessGrantees.add(player);
     }
 
     @Deprecated
@@ -163,23 +133,20 @@ public class GameSession {
     }
 
     public boolean isPlayer(@NotNull Player player) {
-        return isRobber(player) || isCop(player);
+        return playerStates.containsKey(player.getUniqueId());
     }
 
     public boolean isFull() {
-        return (cops.size() + robbers.size()) >= settings.getMaxPlayers();
+        return playerStates.size() >= settings.getMaxPlayers();
     }
 
     @NotNull
-    public List<Player> getPlayers() {
-        List<Player> players = new ArrayList<>();
-        players.addAll(robbers);
-        players.addAll(cops);
-        return players;
+    public List<UUID> getPlayers() {
+        return new ArrayList<>(playerStates.keySet());
     }
 
     public int getPlayerCount() {
-        return robbers.size() + cops.size();
+        return playerStates.size();
     }
 
     @NotNull
@@ -225,9 +192,16 @@ public class GameSession {
         } else if (broadcast) {
             messageHandler.broadcast(Message.ROBBER_ESCAPED, true, winner.getName(), region.getId());
         }
-        getPlayers().forEach(this::teleportPlayerToLobby);
+
+        getPlayers().forEach(uuid -> {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                teleportPlayerToLobby(player);
+            }
+        });
+
         cops.clear();
-        robbers.clear();
+        playerStates.clear();
         prisonAccessGrantees.clear();
         restoreDoors();
     }
