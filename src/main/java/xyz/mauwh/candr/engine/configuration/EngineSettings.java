@@ -2,6 +2,7 @@ package xyz.mauwh.candr.engine.configuration;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -28,6 +29,7 @@ public class EngineSettings {
     private int maxPlayers;
     private int minPlayersTwoCops;
     private int minPlayersThreeCops;
+    private Material winMaterial;
     private List<ItemStack> copItems;
     private List<ItemStack> robberItems;
     private Location lobbySpawn;
@@ -52,6 +54,7 @@ public class EngineSettings {
         doorVulnerabilityInterval = configuration.getInt("door-vulnerability-interval");
         doorVulnerabilityChance =   configuration.getDouble("door-vulnerability-chance");
         maxGameDuration =           configuration.getInt("max-game-duration");
+        winMaterial =               Material.valueOf(configuration.getString("win-material", "AIR").toUpperCase());
 
         if (!configuration.isConfigurationSection("lobby-spawn")) {
             logSettings();
@@ -70,6 +73,10 @@ public class EngineSettings {
         if (lobbySpawn == null) {
             logger.warning("Unable to set lobby: unable to find world with name '" + worldName + "'");
         }
+
+        if (winMaterial == Material.AIR || !winMaterial.isBlock()) {
+            logger.warning(String.format("Win material %s is not a valid block, this may affect the game's expected behavior", winMaterial));
+        }
     }
 
     /**
@@ -86,6 +93,7 @@ public class EngineSettings {
         logger.info("Max players: " +                   maxPlayers);
         logger.info("Min players two cops: " +          minPlayersTwoCops);
         logger.info("Min players three cops: " +        minPlayersThreeCops);
+        logger.info("Win material: " +                  winMaterial);
         logger.info("Cop items: " +                     copItems);
         logger.info("Robber items: " +                  robberItems);
         logger.info("Lobby spawnpoint: " +              lobbySpawn);
@@ -163,6 +171,15 @@ public class EngineSettings {
      */
     public int getMinPlayersThreeCops() {
         return minPlayersThreeCops;
+    }
+
+    /**
+     * Gets the block material that a robber must interact with to win the game
+     * @return the win material
+     */
+    @NotNull
+    public Material getWinMaterial() {
+        return winMaterial;
     }
 
     /**

@@ -162,6 +162,7 @@ public class GameSession {
 
         playerStates.clear();
         restoreDoors();
+        active = false;
     }
 
     public void makeDoorsVulnerable() {

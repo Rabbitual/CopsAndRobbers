@@ -7,6 +7,7 @@ door-malfunction-duration: 15
 max-players: 24
 min-players-two-cops: 8
 min-players-three-cops: 16
+win-material: GOLD_BLOCK
 lobby-spawn:
   #x: 0.0
   #y: 0.0
