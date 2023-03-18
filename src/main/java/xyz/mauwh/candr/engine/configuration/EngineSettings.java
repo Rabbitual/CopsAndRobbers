@@ -1,12 +1,9 @@
 package xyz.mauwh.candr.engine.configuration;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,35 +40,25 @@ public class EngineSettings {
      * @param configuration - the configuration to load the engine settings from
      */
     public void load(@NotNull final YamlConfiguration configuration) {
-        copItems =                  deserializeItemStackList(configuration, "cop-items");
-        robberItems =               deserializeItemStackList(configuration, "robber-items");
-        minPlayersThreeCops =       configuration.getInt("min-players-three-cops");
-        minPlayersTwoCops =         configuration.getInt("min-players-two-cops");
-        maxPlayers =                configuration.getInt("max-players");
-        copsSelectionDelay =        configuration.getInt("cops-selection-delay");
-        doorMalfunctionDuration =   configuration.getInt("door-malfunction-duration");
+        copItems = deserializeItemStackList(configuration, "cop-items");
+        robberItems = deserializeItemStackList(configuration, "robber-items");
+        minPlayersThreeCops = configuration.getInt("min-players-three-cops");
+        minPlayersTwoCops = configuration.getInt("min-players-two-cops");
+        maxPlayers = configuration.getInt("max-players");
+        copsSelectionDelay = configuration.getInt("cops-selection-delay");
+        doorMalfunctionDuration = configuration.getInt("door-malfunction-duration");
         doorVulnerabilityDuration = configuration.getInt("door-vulnerability-duration");
         doorVulnerabilityInterval = configuration.getInt("door-vulnerability-interval");
-        doorVulnerabilityChance =   configuration.getDouble("door-vulnerability-chance");
-        maxGameDuration =           configuration.getInt("max-game-duration");
-        winMaterial =               Material.valueOf(configuration.getString("win-material", "AIR").toUpperCase());
-
-        if (!configuration.isConfigurationSection("lobby-spawn")) {
-            logSettings();
-            logger.warning("Unable to set lobby spawn: no lobby configured");
-            return;
-        }
-
-        double x = NumberConversions.toDouble(configuration.get("lobby-spawn.x"));
-        double y = NumberConversions.toDouble(configuration.get("lobby-spawn.y"));
-        double z = NumberConversions.toDouble(configuration.get("lobby-spawn.z"));
-        String worldName = String.valueOf(configuration.get("lobby-spawn.world"));
-        World world = Bukkit.getWorld(worldName);
-        lobbySpawn = world == null ? null : new Location(world, x, y, z);
+        doorVulnerabilityChance = configuration.getDouble("door-vulnerability-chance");
+        maxGameDuration = configuration.getInt("max-game-duration");
+        winMaterial = Material.valueOf(configuration.getString("win-material", "AIR").toUpperCase());
+        lobbySpawn = configuration.getLocation("lobby-spawn");
 
         logSettings();
-        if (lobbySpawn == null) {
-            logger.warning("Unable to set lobby: unable to find world with name '" + worldName + "'");
+        if (!configuration.isConfigurationSection("lobby-spawn")) {
+            logger.warning("Unable to set lobby spawn: no lobby configured");
+        } else if (lobbySpawn == null) {
+            logger.warning("Unable to set lobby: unable to find world with name '" + configuration.getString("lobby-spawn.world") + "'");
         }
 
         if (winMaterial == Material.AIR || !winMaterial.isBlock()) {
@@ -84,19 +71,19 @@ public class EngineSettings {
      */
     private void logSettings() {
         logger.info("-------- Cops And Robbers Engine Settings --------");
-        logger.info("Max game duration: " +             maxGameDuration);
-        logger.info("Cops selection delay: " +          copsSelectionDelay);
-        logger.info("Door vulnerability chance: " +     (doorVulnerabilityChance * 100) + "%");
-        logger.info("Door vulnerability interval: " +   doorVulnerabilityInterval);
-        logger.info("Door vulnerability duration: " +   doorVulnerabilityDuration);
-        logger.info("Door malfunction duration: " +     doorMalfunctionDuration);
-        logger.info("Max players: " +                   maxPlayers);
-        logger.info("Min players two cops: " +          minPlayersTwoCops);
-        logger.info("Min players three cops: " +        minPlayersThreeCops);
-        logger.info("Win material: " +                  winMaterial);
-        logger.info("Cop items: " +                     copItems);
-        logger.info("Robber items: " +                  robberItems);
-        logger.info("Lobby spawnpoint: " +              lobbySpawn);
+        logger.info("Max game duration: " + maxGameDuration);
+        logger.info("Cops selection delay: " + copsSelectionDelay);
+        logger.info("Door vulnerability chance: " + (doorVulnerabilityChance * 100) + "%");
+        logger.info("Door vulnerability interval: " + doorVulnerabilityInterval);
+        logger.info("Door vulnerability duration: " + doorVulnerabilityDuration);
+        logger.info("Door malfunction duration: " + doorMalfunctionDuration);
+        logger.info("Max players: " + maxPlayers);
+        logger.info("Min players two cops: " + minPlayersTwoCops);
+        logger.info("Min players three cops: " + minPlayersThreeCops);
+        logger.info("Win material: " + winMaterial);
+        logger.info("Cop items: " + copItems);
+        logger.info("Robber items: " + robberItems);
+        logger.info("Lobby spawnpoint: " + lobbySpawn);
     }
 
     /**
