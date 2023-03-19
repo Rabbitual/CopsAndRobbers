@@ -8,7 +8,7 @@ public enum Message {
     CANDR_COMMAND_USAGE("candr-command-usage"),
     PLAYERS_ONLY_COMMAND("players-only-command"),
     ROBBERS_ONLY_COMMAND("robbers-only-command"),
-    IN_GAME_ONLY_COMMAND("robbers-only-command"),
+    IN_GAME_ONLY_COMMAND("in-game-only-command"),
     NOT_TIME_FOR_COMMAND("not-time-for-command"),
     GAME_DOES_NOT_EXIST("game-does-not-exist"),
     GAME_CURRENTLY_FULL("game-currently-full"),
