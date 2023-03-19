@@ -50,7 +50,6 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
         CopsAndRobbersEngine engine = new CopsAndRobbersEngine(this, settings, messageHandler);
         engine.initialize();
 
-        getCommand("cops").setExecutor(new CopsCommand(engine));
         getCommand("open").setExecutor(new OpenCellsCommand(engine));
 
         BukkitCommandManager commandManager = new BukkitCommandManager(this);
@@ -69,6 +68,7 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
         contexts.registerIssuerAwareContext(GameSession.class, new GameSessionContextResolver(engine));
 
         commandManager.registerCommand(new CandrCommand(messageHandler));
+        commandManager.registerCommand(new CopsCommand(messageHandler));
 
         PrisonInteractionsHandler prisonInteractionsHandler = new PrisonInteractionsHandler(engine);
         PlayerInteractListener listener = new PlayerInteractListener(prisonInteractionsHandler);

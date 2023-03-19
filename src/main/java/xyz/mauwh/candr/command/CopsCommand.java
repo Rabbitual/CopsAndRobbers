@@ -1,39 +1,25 @@
 package xyz.mauwh.candr.command;
 
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.Flags;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.game.GameSession;
 import xyz.mauwh.candr.game.PlayerState;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
-public class CopsCommand implements CommandExecutor {
+public class CopsCommand extends BaseCommand {
 
-    private final CopsAndRobbersEngine engine;
     private final MessageHandler messageHandler;
 
-    public CopsCommand(@NotNull CopsAndRobbersEngine engine) {
-        this.engine = engine;
-        this.messageHandler = engine.getMessageHandler();
+    public CopsCommand(@NotNull MessageHandler messageHandler) {
+        this.messageHandler = messageHandler;
     }
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        BukkitAudiences audiences = messageHandler.getAudiences();
-        Audience audience = audiences.sender(sender);
-        if (!(sender instanceof Player)) {
-            messageHandler.sendMessage(audience, Message.PLAYERS_ONLY_COMMAND, true);
-            return true;
-        }
-
-        Player player = (Player)sender;
-        GameSession session = engine.getGameSession(player);
+    @CommandAlias("cops")
+    public void onCops(@NotNull Player player, @Flags("noArg") GameSession session) {
         Message message;
         if (session == null) {
             message = Message.IN_GAME_ONLY_COMMAND;
@@ -41,14 +27,13 @@ public class CopsCommand implements CommandExecutor {
             message = Message.ALREADY_A_COP;
         } else if (session.hasMaxAllowedCops()) {
             message = Message.NOT_ACCEPTING_APPLICATIONS;
-        } else if (!session.addCopApplicant(player)) {
-            message = Message.ALREADY_APPLIED_FOR_COP;
-        } else {
+        } else if (session.addCopApplicant(player)) {
             message = Message.APPLIED_FOR_COP;
+        } else {
+            message = Message.ALREADY_APPLIED_FOR_COP;
         }
 
-        messageHandler.sendMessage(audience, message, true);
-        return true;
+        messageHandler.sendMessage(player, message, true);
     }
 
 }
