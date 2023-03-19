@@ -156,6 +156,7 @@ public class GameSession {
         getPlayers().forEach(uuid -> {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
+                player.getInventory().clear();
                 teleportPlayerToLobby(player);
             }
         });

@@ -40,8 +40,9 @@ public class EngineSettings {
      * @param configuration - the configuration to load the engine settings from
      */
     public void load(@NotNull final YamlConfiguration configuration) {
-        copItems = deserializeItemStackList(configuration, "cop-items");
-        robberItems = deserializeItemStackList(configuration, "robber-items");
+        List<?> emptyList = Collections.emptyList();
+        copItems = configuration.getList("cop-items", emptyList).stream().filter(e -> e instanceof ItemStack).map(e -> (ItemStack)e).toList();
+        robberItems = configuration.getList("robber-items", emptyList).stream().filter(e -> e instanceof ItemStack).map(e -> (ItemStack)e).toList();
         minPlayersThreeCops = configuration.getInt("min-players-three-cops");
         minPlayersTwoCops = configuration.getInt("min-players-two-cops");
         maxPlayers = configuration.getInt("max-players");
@@ -81,8 +82,8 @@ public class EngineSettings {
         logger.info("Min players two cops: " + minPlayersTwoCops);
         logger.info("Min players three cops: " + minPlayersThreeCops);
         logger.info("Win material: " + winMaterial);
-        logger.info("Cop items: " + copItems);
-        logger.info("Robber items: " + robberItems);
+        logger.info("Cop items: " + copItems.size());
+        logger.info("Robber items: " + robberItems.size());
         logger.info("Lobby spawnpoint: " + lobbySpawn);
     }
 
@@ -194,23 +195,6 @@ public class EngineSettings {
     @Nullable
     public Location getLobbySpawn() {
         return lobbySpawn;
-    }
-
-    /**
-     * Deserializes a map list from the specified path as a list of {@link org.bukkit.inventory.ItemStack}s
-     * @param configuration - the configuration containing the ItemStack list
-     * @param path - the path of the ItemStack list
-     * @return a list of the ItemStacks that could be serialized
-     */
-    @NotNull
-    private List<ItemStack> deserializeItemStackList(@NotNull YamlConfiguration configuration, @NotNull String path) {
-        List<Map<?, ?>> list = configuration.getMapList(path);
-        List<ItemStack> itemStacks = new ArrayList<>();
-        for (Map<?, ?> map : list) {
-            //noinspection unchecked
-            itemStacks.add(ItemStack.deserialize((Map<String, Object>)map));
-        }
-        return itemStacks;
     }
 
 }

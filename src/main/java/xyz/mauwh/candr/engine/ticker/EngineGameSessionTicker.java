@@ -124,6 +124,7 @@ public class EngineGameSessionTicker {
         session.setPlayerState(newCop, PlayerState.COP);
         session.removeCopApplicant(newCop);
         session.teleportCopToMainRoom(newCop);
+        session.getSettings().getCopItems().forEach(newCop.getInventory()::addItem);
         return newCop;
     }
 
