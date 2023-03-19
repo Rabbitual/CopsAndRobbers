@@ -40,7 +40,7 @@ public class GameSessionContextResolver implements IssuerAwareContextResolver<Ga
             if (sessionArg != null) {
                 messageHandler.sendMessage(player, Message.GAME_DOES_NOT_EXIST, true);
             }
-            throw new InvalidCommandArgument(sessionArg != null);
+            throw new InvalidCommandArgument(sessionArg == null);
         }
 
         return session;
