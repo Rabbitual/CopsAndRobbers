@@ -1,66 +1,52 @@
 package xyz.mauwh.candr.command;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.CommandHelp;
+import co.aikar.commands.annotation.*;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.game.GameSession;
 import xyz.mauwh.candr.game.PlayerState;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
-public class CandrCommand implements CommandExecutor {
+@CommandAlias("candr")
+public class CandrCommand extends BaseCommand {
 
-    private final CopsAndRobbersEngine engine;
     private final MessageHandler messageHandler;
-    private final CandrJoinSubcommand joinSubcommand;
 
-    public CandrCommand(@NotNull CopsAndRobbersEngine engine) {
-        this.engine = engine;
-        this.messageHandler = engine.getMessageHandler();
-        this.joinSubcommand = new CandrJoinSubcommand(engine, messageHandler);
+    public CandrCommand(@NotNull MessageHandler messageHandler) {
+        this.messageHandler = messageHandler;
     }
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!engine.isActive()) {
-            messageHandler.sendMessage(sender, Message.ENGINE_IS_HALTED, true);
-            return true;
-        }
-
+    @Subcommand("join")
+    @Description("Joins the specified game of cops and robbers if it is active")
+    @Syntax("<gameId>")
+    @CommandPermission("copsandrobbers.candr.join")
+    public void onJoin(CommandSender sender, GameSession session) {
         if (!(sender instanceof Player)) {
             messageHandler.sendMessage(sender, Message.PLAYERS_ONLY_COMMAND, true);
-            return true;
-        }
-
-        String[] ids = engine.getSessionIDsAsStringArray();
-        String joinedIDs = String.join("|", ids);
-        if (args.length == 0) {
-            messageHandler.sendMessage(sender, Message.CANDR_COMMAND_USAGE, true, joinedIDs);
-            return true;
+            return;
         }
 
         Player player = (Player)sender;
-        String subcommand = args[0].toLowerCase();
-        switch (subcommand) {
-            case "leave", "quit" -> executeLeaveCommand(player);
-            case "join" -> joinSubcommand.execute(player, args);
-            default -> messageHandler.sendMessage(sender, Message.CANDR_COMMAND_USAGE, true, joinedIDs);
+        session.setPlayerState(player, PlayerState.ROBBER);
+        session.teleportRobberToCell(player);
+        messageHandler.sendMessage(sender, Message.JOINED_GAME, true, session.getRegion().getId());
+        if (!session.hasMaxAllowedCops()) {
+            messageHandler.sendMessage(sender, Message.JAIL_COULD_USE_COPS, true);
         }
-
-        return true;
     }
 
-    /**
-     * Leaves the game for the specified player, and announces their retirement if they are a cop
-     * @param player - the player leaving the game
-     */
-    private void executeLeaveCommand(@NotNull Player player) {
-        GameSession session = engine.getGameSession(player);
+    @Subcommand("leave|quit")
+    @Description("Leaves your current game of cops and robbers")
+    @CommandPermission("copsandrobbers.candr.leave")
+    @Syntax("[]")
+    public void onLeave(Player player, @Conditions("isPlayer") @Flags("noArg") GameSession session) {
         if (session == null) {
-            messageHandler.sendMessage(player, Message.GAME_DOES_NOT_EXIST, true);
+            messageHandler.sendMessage(player, Message.IN_GAME_ONLY_COMMAND, true);
             return;
         }
 
@@ -77,6 +63,12 @@ public class CandrCommand implements CommandExecutor {
         if (!session.hasMaxAllowedCops()) {
             messageHandler.broadcast(Message.COP_RETIRED, true, id);
         }
+    }
+
+    @HelpCommand
+    public void onHelp(@NotNull CommandSender sender, CommandHelp help) {
+        sender.sendMessage(ChatColor.BLUE + "===== Cops and Robbers Help =====");
+        help.showHelp();
     }
 
 }
