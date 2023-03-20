@@ -25,31 +25,19 @@ public class CandrCommand extends BaseCommand {
     @Description("Joins the specified game of cops and robbers if it is active")
     @Syntax("<gameId>")
     @CommandPermission("copsandrobbers.candr.join")
-    public void onJoin(CommandSender sender, GameSession session) {
-        if (!(sender instanceof Player)) {
-            messageHandler.sendMessage(sender, Message.PLAYERS_ONLY_COMMAND, true);
-            return;
-        }
-
-        Player player = (Player)sender;
+    public void onJoin(Player player, GameSession session) {
         session.setPlayerState(player, PlayerState.ROBBER);
         session.teleportRobberToCell(player);
-        messageHandler.sendMessage(sender, Message.JOINED_GAME, true, session.getRegion().getId());
+        messageHandler.sendMessage(player, Message.JOINED_GAME, true, session.getRegion().getId());
         if (!session.hasMaxAllowedCops()) {
-            messageHandler.sendMessage(sender, Message.JAIL_COULD_USE_COPS, true);
+            messageHandler.sendMessage(player, Message.JAIL_COULD_USE_COPS, true);
         }
     }
 
     @Subcommand("leave|quit")
     @Description("Leaves your current game of cops and robbers")
     @CommandPermission("copsandrobbers.candr.leave")
-    @Syntax("[]")
     public void onLeave(Player player, @Conditions("isPlayer") @Flags("noArg") GameSession session) {
-        if (session == null) {
-            messageHandler.sendMessage(player, Message.IN_GAME_ONLY_COMMAND, true);
-            return;
-        }
-
         session.teleportPlayerToLobby(player);
         int id = session.getRegion().getId();
         messageHandler.sendMessage(player, Message.LEFT_GAME, true, id);
