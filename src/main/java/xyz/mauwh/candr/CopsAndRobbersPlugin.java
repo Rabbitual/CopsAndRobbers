@@ -48,7 +48,6 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
         CopsAndRobbersEngine engine = new CopsAndRobbersEngine(this, settings, messageHandler);
         engine.initialize();
 
-
         BukkitCommandManager commandManager = new BukkitCommandManager(this);
         commandManager.enableUnstableAPI("help");
 
@@ -67,14 +66,15 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
         commandManager.registerCommand(new CandrCommand(messageHandler));
         commandManager.registerCommand(new CopsCommand(messageHandler));
         commandManager.registerCommand(new OpenCellsCommand(messageHandler));
+        commandManager.registerCommand(new AdminItemDebugCommand());
+        commandManager.registerCommand(new AdminHaltCommand(engine));
+        commandManager.registerCommand(new AdminStartCommand(engine));
 
         PrisonInteractionsHandler prisonInteractionsHandler = new PrisonInteractionsHandler(engine);
         PlayerInteractListener listener = new PlayerInteractListener(prisonInteractionsHandler);
         getServer().getPluginManager().registerEvents(listener, this);
 
-        // debug
-        commandManager.registerCommand(new AdminItemDebugCommand());
-        commandManager.registerCommand(new AdminHaltCommand(engine));
+        engine.start();
     }
 
     @NotNull
