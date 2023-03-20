@@ -1,9 +1,7 @@
 package xyz.mauwh.candr.command;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
@@ -25,6 +23,7 @@ public class AdminHaltCommand extends BaseCommand {
 
     @Subcommand("engine")
     @CommandPermission("candr.admin.halt")
+    @Description("Halts the CopsAndRobbers engine, forcefully stopping all sessions until manually resumed")
     public void onHaltEngine(CommandSender sender) {
         if (engine.isActive()) {
             engine.halt();
@@ -36,6 +35,8 @@ public class AdminHaltCommand extends BaseCommand {
 
     @Subcommand("session")
     @CommandPermission("candr.admin.halt")
+    @Syntax("[sessionId]")
+    @Description("Halts the specified Cops and Robbers session, forcefully stopping it until manually resumed")
     public void onHaltSession(CommandSender sender, GameSession session) {
         if (engine.isActive() && session.isActive()) {
             session.endGame(null, true);
