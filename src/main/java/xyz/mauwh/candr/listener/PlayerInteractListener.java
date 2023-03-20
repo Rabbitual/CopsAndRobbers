@@ -4,6 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
+import xyz.mauwh.candr.engine.PrisonInteractionsHandler;
 
 public class PlayerInteractListener implements Listener {
 

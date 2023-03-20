@@ -1,4 +1,4 @@
-package xyz.mauwh.candr.listener;
+package xyz.mauwh.candr.engine;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
-import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.game.GameSession;
 import xyz.mauwh.candr.game.PlayerState;
 

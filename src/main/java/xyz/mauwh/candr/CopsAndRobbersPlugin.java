@@ -17,7 +17,7 @@ import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
 import xyz.mauwh.candr.game.GameSession;
 import xyz.mauwh.candr.listener.PlayerInteractListener;
-import xyz.mauwh.candr.listener.PrisonInteractionsHandler;
+import xyz.mauwh.candr.engine.PrisonInteractionsHandler;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
