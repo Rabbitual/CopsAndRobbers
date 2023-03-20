@@ -102,20 +102,20 @@ public class CopsAndRobbersEngine {
                 return;
             }
             sessions.put(id, session);
-            session.start();
         });
 
         if (sessions.isEmpty()) {
             logger.info("No existing session configurations found, skipping setup");
-            return;
         }
+    }
 
+    public void start() {
+        sessions.values().forEach(GameSession::start);
         this.runnable = new BukkitRunnable() {
             @Override
             public void run() {
-                sessions.values().forEach(GameSession::tick);
-                if (!active) {
-                    cancel();
+                if (active) {
+                    sessions.values().forEach(GameSession::tick);
                 }
             }
         };
@@ -130,6 +130,7 @@ public class CopsAndRobbersEngine {
 
         if (!runnable.isCancelled()) {
             runnable.cancel();
+            runnable = null;
         }
 
         sessions.values().forEach(session -> session.endGame(null, true));
