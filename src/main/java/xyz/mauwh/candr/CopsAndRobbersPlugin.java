@@ -8,10 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import xyz.mauwh.candr.command.CandrCommand;
-import xyz.mauwh.candr.command.CopsCommand;
-import xyz.mauwh.candr.command.AdminItemDebugCommand;
-import xyz.mauwh.candr.command.OpenCellsCommand;
+import xyz.mauwh.candr.command.*;
 import xyz.mauwh.candr.command.context.GameSessionContextResolver;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
@@ -77,6 +74,7 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
 
         // debug
         commandManager.registerCommand(new AdminItemDebugCommand());
+        commandManager.registerCommand(new AdminHaltCommand(engine));
     }
 
     @NotNull

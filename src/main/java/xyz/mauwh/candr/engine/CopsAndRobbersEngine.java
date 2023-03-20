@@ -132,8 +132,7 @@ public class CopsAndRobbersEngine {
             runnable.cancel();
         }
 
-        sessions.values().forEach(session -> session.endGame(null, false));
-        sessions.clear();
+        sessions.values().forEach(session -> session.endGame(null, true));
         active = false;
     }
 
