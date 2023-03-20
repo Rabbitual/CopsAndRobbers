@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.command.CandrCommand;
 import xyz.mauwh.candr.command.CopsCommand;
+import xyz.mauwh.candr.command.AdminItemDebugCommand;
 import xyz.mauwh.candr.command.OpenCellsCommand;
 import xyz.mauwh.candr.command.context.GameSessionContextResolver;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
@@ -73,6 +74,9 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
         PrisonInteractionsHandler prisonInteractionsHandler = new PrisonInteractionsHandler(engine);
         PlayerInteractListener listener = new PlayerInteractListener(prisonInteractionsHandler);
         getServer().getPluginManager().registerEvents(listener, this);
+
+        // debug
+        commandManager.registerCommand(new AdminItemDebugCommand());
     }
 
     @NotNull
