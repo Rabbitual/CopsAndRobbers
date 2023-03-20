@@ -5,10 +5,16 @@ main: xyz.mauwh.candr.CopsAndRobbersPlugin
 commands:
   candr:
     permission: copsandrobbers.candr
+  cops:
+    permission: copsandrobbers.cops
   open:
     permission: copsandrobbers.opencells
 permissions:
   copsandrobbers.candr:
     default: true
+  copsandrobbers.cops:
+    default: true
   copsandrobbers.opencells:
     default: true
+  copsandrobbers.admin.itemdebug:
+    default: op

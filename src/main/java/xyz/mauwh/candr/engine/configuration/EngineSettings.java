@@ -1,18 +1,14 @@
 package xyz.mauwh.candr.engine.configuration;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static xyz.mauwh.message.ColoredConsoleStringBuilder.builder;
 
 /**
  * A container for all settings relating to the Cops and Robber Engine's general functionality. These settings apply to
@@ -30,6 +26,7 @@ public class EngineSettings {
     private int maxPlayers;
     private int minPlayersTwoCops;
     private int minPlayersThreeCops;
+    private Material winMaterial;
     private List<ItemStack> copItems;
     private List<ItemStack> robberItems;
     private Location lobbySpawn;
@@ -42,10 +39,11 @@ public class EngineSettings {
      * Loads all configured settings from the provided {@link org.bukkit.configuration.file.YamlConfiguration}
      * @param configuration - the configuration to load the engine settings from
      */
-    public void load(@NotNull final YamlConfiguration configuration, boolean logSettings) {
+    public void load(@NotNull final YamlConfiguration configuration) {
+        List<?> emptyList = Collections.emptyList();
+        copItems = configuration.getList("cop-items", emptyList).stream().filter(e -> e instanceof ItemStack).map(e -> (ItemStack)e).toList();
+        robberItems = configuration.getList("robber-items", emptyList).stream().filter(e -> e instanceof ItemStack).map(e -> (ItemStack)e).toList();
         minPlayersThreeCops = configuration.getInt("min-players-three-cops");
-        copItems = deserializeItemStackList(configuration, "cop-items");
-        robberItems = deserializeItemStackList(configuration, "robber-items");
         minPlayersTwoCops = configuration.getInt("min-players-two-cops");
         maxPlayers = configuration.getInt("max-players");
         copsSelectionDelay = configuration.getInt("cops-selection-delay");
@@ -54,46 +52,18 @@ public class EngineSettings {
         doorVulnerabilityInterval = configuration.getInt("door-vulnerability-interval");
         doorVulnerabilityChance = configuration.getDouble("door-vulnerability-chance");
         maxGameDuration = configuration.getInt("max-game-duration");
+        winMaterial = Material.valueOf(configuration.getString("win-material", "AIR").toUpperCase());
+        lobbySpawn = configuration.getLocation("lobby-spawn");
 
-        var unexpectedBehavior = builder().yellow("The plugin might not function as expected").reset();
+        logSettings();
         if (!configuration.isConfigurationSection("lobby-spawn")) {
-            if (logSettings) {
-                logSettings();
-            }
-            builder().yellow("Unable to set lobby spawn: no lobby configured").reset().post(logger, Level.WARNING);
-            unexpectedBehavior.post(logger, Level.WARNING);
-            return;
+            logger.warning("Unable to set lobby spawn: no lobby configured");
+        } else if (lobbySpawn == null) {
+            logger.warning("Unable to set lobby: unable to find world with name '" + configuration.getString("lobby-spawn.world") + "'");
         }
 
-        Object x = configuration.get("lobby-spawn.x");
-        Object y = configuration.get("lobby-spawn.y");
-        Object z = configuration.get("lobby-spawn.z");
-        Object worldName = configuration.get("lobby-spawn.world");
-        if (!(x instanceof Number && y instanceof Number && z instanceof Number)) {
-            if (logSettings) {
-                logSettings();
-            }
-            builder().yellow("Unable to set lobby spawn: invalid coordinates").reset().post(logger, Level.WARNING);
-            unexpectedBehavior.post(logger, Level.WARNING);
-            return;
-        }
-
-        World world = worldName == null ? null : Bukkit.getWorld(worldName.toString());
-        if (world == null) {
-            if (logSettings) {
-                logSettings();
-            }
-            builder().yellow("Unable to set lobby: unable to find world with name '" + worldName + "'").reset().post(logger, Level.WARNING);
-            unexpectedBehavior.post(logger, Level.WARNING);
-            return;
-        }
-
-        double xDbl = ((Number)x).doubleValue();
-        double yDbl = ((Number)y).doubleValue();
-        double zDbl = ((Number)z).doubleValue();
-        lobbySpawn = new Location(world, xDbl, yDbl, zDbl);
-        if (logSettings) {
-            logSettings();
+        if (winMaterial == Material.AIR || !winMaterial.isBlock()) {
+            logger.warning(String.format("Win material %s is not a valid block, this may affect the game's expected behavior", winMaterial));
         }
     }
 
@@ -111,18 +81,10 @@ public class EngineSettings {
         logger.info("Max players: " + maxPlayers);
         logger.info("Min players two cops: " + minPlayersTwoCops);
         logger.info("Min players three cops: " + minPlayersThreeCops);
-        logger.info("Cop items: [" + String.join(" / ", copItems.stream().map(Object::toString).toArray(String[]::new)) + "]");
-        logger.info("Robber items: [" + String.join(" / ", robberItems.stream().map(Object::toString).toArray(String[]::new)) + "]");
-
-        String locationString;
-        if (lobbySpawn == null) {
-            locationString = "null";
-        } else {
-            String worldName = Objects.requireNonNull(lobbySpawn.getWorld()).getName();
-            locationString = String.format("world: %s, x: %s, y: %s, z: %s", worldName, lobbySpawn.getX(), lobbySpawn.getY(), lobbySpawn.getZ());
-        }
-
-        logger.info("Lobby spawnpoint: [" + locationString + "]");
+        logger.info("Win material: " + winMaterial);
+        logger.info("Cop items: " + copItems.size());
+        logger.info("Robber items: " + robberItems.size());
+        logger.info("Lobby spawnpoint: " + lobbySpawn);
     }
 
     /**
@@ -200,6 +162,15 @@ public class EngineSettings {
     }
 
     /**
+     * Gets the block material that a robber must interact with to win the game
+     * @return the win material
+     */
+    @NotNull
+    public Material getWinMaterial() {
+        return winMaterial;
+    }
+
+    /**
      * Gets a list of the items that are given to cops upon their selection
      * @return the items given to cops
      */
@@ -224,23 +195,6 @@ public class EngineSettings {
     @Nullable
     public Location getLobbySpawn() {
         return lobbySpawn;
-    }
-
-    /**
-     * Deserializes a map list from the specified path as a list of {@link org.bukkit.inventory.ItemStack}s
-     * @param configuration - the configuration containing the ItemStack list
-     * @param path - the path of the ItemStack list
-     * @return a list of the ItemStacks that could be serialized
-     */
-    @NotNull
-    private List<ItemStack> deserializeItemStackList(@NotNull YamlConfiguration configuration, @NotNull String path) {
-        List<Map<?, ?>> list = configuration.getMapList(path);
-        List<ItemStack> itemStacks = new ArrayList<>();
-        for (Map<?, ?> map : list) {
-            //noinspection unchecked
-            itemStacks.add(ItemStack.deserialize((Map<String, Object>)map));
-        }
-        return itemStacks;
     }
 
 }

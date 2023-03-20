@@ -3,6 +3,7 @@ package xyz.mauwh.candr.game;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
+import xyz.mauwh.candr.region.RegionNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,16 +14,16 @@ public class GameRegion {
     private final World world;
     private final Location minPos;
     private final Location maxPos;
-    private List<Location> copSpawnPoints;
+    private Location copSpawnPoint;
     private List<Location> robberSpawnPoints;
     private List<Location> doorPositions;
+    private List<RegionNode> nodes;
 
     public GameRegion(int id, @NotNull World world, @NotNull Location minPos, @NotNull Location maxPos) {
         this.id = id;
         this.world = world;
         this.minPos = minPos;
         this.maxPos = maxPos;
-        this.copSpawnPoints = new ArrayList<>();
         this.robberSpawnPoints = new ArrayList<>();
         this.doorPositions = new ArrayList<>();
     }
@@ -47,12 +48,12 @@ public class GameRegion {
     }
 
     @NotNull
-    public List<Location> getCopSpawnPoints() {
-        return List.copyOf(copSpawnPoints);
+    public Location getCopSpawnPoint() {
+        return copSpawnPoint.clone();
     }
 
-    public void setCopSpawnPoints(@NotNull List<Location> copSpawnPoints) {
-        this.copSpawnPoints = List.copyOf(copSpawnPoints);
+    public void setCopSpawnPoint(@NotNull Location location) {
+        this.copSpawnPoint = location.clone();
     }
 
     @NotNull
@@ -71,6 +72,15 @@ public class GameRegion {
 
     public void setDoorPositions(@NotNull List<Location> doorPositions) {
         this.doorPositions = List.copyOf(doorPositions);
+    }
+
+    @NotNull
+    public List<RegionNode> getNodes() {
+        return List.copyOf(nodes);
+    }
+
+    public void setNodes(@NotNull List<RegionNode> nodes) {
+        this.nodes = List.copyOf(nodes);
     }
 
 }
