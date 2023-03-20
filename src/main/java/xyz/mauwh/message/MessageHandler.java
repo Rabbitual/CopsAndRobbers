@@ -68,7 +68,7 @@ public final class MessageHandler {
 
         Component result = miniMessage.deserialize(replaced);
         if (prefixed) {
-            Component prefix = getMessage(Message.PREFIX, false);
+            Component prefix = getMessage(Message.PLUGIN_PREFIX, false);
             result = Component.text().append(prefix, result).build();
         }
         return result;
