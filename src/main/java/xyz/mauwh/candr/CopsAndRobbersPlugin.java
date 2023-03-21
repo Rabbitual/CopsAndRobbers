@@ -5,7 +5,6 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.command.*;
@@ -60,13 +59,12 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
         });
 
         BukkitCommandContexts contexts = (BukkitCommandContexts)commandManager.getCommandContexts();
-        contexts.registerIssuerOnlyContext(ItemStack.class, context -> context.getPlayer().getInventory().getItemInMainHand());
         contexts.registerIssuerAwareContext(GameSession.class, new GameSessionContextResolver(engine));
 
         commandManager.registerCommand(new CandrCommand(messageHandler));
         commandManager.registerCommand(new CopsCommand(messageHandler));
         commandManager.registerCommand(new OpenCellsCommand(messageHandler));
-        commandManager.registerCommand(new AdminItemDebugCommand());
+        commandManager.registerCommand(new AdminItemCommand(engine));
         commandManager.registerCommand(new AdminHaltCommand(engine));
         commandManager.registerCommand(new AdminStartCommand(engine));
 
