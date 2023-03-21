@@ -1,13 +1,11 @@
 package xyz.mauwh.candr.command;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.Description;
-import co.aikar.commands.annotation.Subcommand;
-import co.aikar.commands.annotation.Syntax;
+import co.aikar.commands.annotation.*;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
+import xyz.mauwh.candr.game.GameSession;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
@@ -37,9 +35,11 @@ public class AdminStartCommand extends BaseCommand {
     @Subcommand("session")
     @Syntax("[sessionId]")
     @Description("Starts the specified Cops and Robbers session if it is not already active")
-    public void onSessionStart(CommandSender sender) {
+    public void onSessionStart(CommandSender sender, GameSession session) {
         if (!engine.isActive()) {
-            engine.start();
+            messageHandler.sendMessage(sender, Message.ENGINE_IS_HALTED, true);
+        } else if (!session.isActive()) {
+            session.start();
             messageHandler.broadcast(Message.SESSION_NOW_RESUMED, true);
         } else {
             messageHandler.sendMessage(sender, Message.SESSION_NOT_HALTED, true);
