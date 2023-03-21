@@ -7,6 +7,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -41,8 +43,11 @@ public class EngineSettings {
      */
     public void load(@NotNull final YamlConfiguration configuration) {
         List<?> emptyList = Collections.emptyList();
-        copItems = configuration.getList("cop-items", emptyList).stream().filter(e -> e instanceof ItemStack).map(e -> (ItemStack)e).toList();
-        robberItems = configuration.getList("robber-items", emptyList).stream().filter(e -> e instanceof ItemStack).map(e -> (ItemStack)e).toList();
+        List<?> serializedCopItems = configuration.getList("cop-items", emptyList);
+        List<?> serializedRobberItems = configuration.getList("robber-items", emptyList);
+        copItems = getMutableCopyOfItemStackList(serializedCopItems);
+        robberItems = getMutableCopyOfItemStackList(serializedRobberItems);
+
         minPlayersThreeCops = configuration.getInt("min-players-three-cops");
         minPlayersTwoCops = configuration.getInt("min-players-two-cops");
         maxPlayers = configuration.getInt("max-players");
@@ -65,6 +70,41 @@ public class EngineSettings {
         if (winMaterial == Material.AIR || !winMaterial.isBlock()) {
             logger.warning(String.format("Win material %s is not a valid block, this may affect the game's expected behavior", winMaterial));
         }
+    }
+
+    public void save(@NotNull File file) {
+        YamlConfiguration config = new YamlConfiguration();
+        config.set("cop-items", copItems);
+        config.set("robber-items", robberItems);
+        config.set("min-players-three-cops", minPlayersThreeCops);
+        config.set("min-players-two-cops", minPlayersTwoCops);
+        config.set("max-players", maxPlayers);
+        config.set("cops-selection-delay", copsSelectionDelay);
+        config.set("door-malfunction-duration", doorMalfunctionDuration);
+        config.set("door-vulnerability-duration", doorVulnerabilityInterval);
+        config.set("door-vulnerability-interval", doorVulnerabilityInterval);
+        config.set("door-vulnerability-chance", doorVulnerabilityChance);
+        config.set("max-game-duration", maxGameDuration);
+        config.set("win-material", winMaterial.toString());
+        config.set("lobby-spawn", lobbySpawn);
+
+        try {
+            config.save(file);
+        } catch (IOException err) {
+            logger.severe("An unexpected error occurred while attempting to save CopsAndRobbers engine settings:");
+            err.printStackTrace();
+        }
+    }
+
+    @NotNull
+    private List<ItemStack> getMutableCopyOfItemStackList(@NotNull List<?> orig) {
+        List<ItemStack> list = new ArrayList<>();
+        for (Object o : orig) {
+            if (o instanceof ItemStack) {
+                list.add((ItemStack)o);
+            }
+        }
+        return list;
     }
 
     /**
@@ -176,7 +216,7 @@ public class EngineSettings {
      */
     @NotNull
     public List<ItemStack> getCopItems() {
-        return copItems.stream().map(ItemStack::clone).toList();
+        return copItems;
     }
 
     /**
@@ -185,7 +225,7 @@ public class EngineSettings {
      */
     @NotNull
     public List<ItemStack> getRobberItems() {
-        return robberItems.stream().map(ItemStack::clone).toList();
+        return robberItems;
     }
 
     /**
