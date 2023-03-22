@@ -75,7 +75,7 @@ public class EngineSettings {
         }
     }
 
-    public void save(@NotNull File file) {
+    public void save() {
         YamlConfiguration config = new YamlConfiguration();
         config.set("cop-items", copItems);
         config.set("robber-items", robberItems);
