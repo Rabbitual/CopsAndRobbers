@@ -42,7 +42,7 @@ public class EngineSettings {
     /**
      * Loads all configured settings from the provided {@link org.bukkit.configuration.file.YamlConfiguration}
      */
-    public void load() {
+    public void reload() {
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(file);
 
         List<?> emptyList = Collections.emptyList();
