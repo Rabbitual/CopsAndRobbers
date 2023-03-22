@@ -1,5 +1,5 @@
 name: CopsAndRobbers
-version: 1.0
+version: ${project.version}
 api-version: 1.16
 main: xyz.mauwh.candr.CopsAndRobbersPlugin
 permissions:
