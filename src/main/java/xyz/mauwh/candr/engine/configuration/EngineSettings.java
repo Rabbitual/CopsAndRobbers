@@ -18,6 +18,7 @@ import java.util.logging.Logger;
  */
 public class EngineSettings {
 
+    private final File file;
     private final Logger logger;
     private int maxGameDuration;
     private int copsSelectionDelay;
@@ -33,15 +34,17 @@ public class EngineSettings {
     private List<ItemStack> robberItems;
     private Location lobbySpawn;
 
-    public EngineSettings(@NotNull Logger logger) {
+    public EngineSettings(@NotNull File file, @NotNull Logger logger) {
+        this.file = file;
         this.logger = logger;
     }
 
     /**
      * Loads all configured settings from the provided {@link org.bukkit.configuration.file.YamlConfiguration}
-     * @param configuration - the configuration to load the engine settings from
      */
-    public void load(@NotNull final YamlConfiguration configuration) {
+    public void load() {
+        YamlConfiguration configuration = YamlConfiguration.loadConfiguration(file);
+
         List<?> emptyList = Collections.emptyList();
         List<?> serializedCopItems = configuration.getList("cop-items", emptyList);
         List<?> serializedRobberItems = configuration.getList("robber-items", emptyList);
