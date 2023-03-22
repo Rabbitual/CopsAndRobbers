@@ -20,7 +20,7 @@ public class OpenCellsCommand extends BaseCommand {
     }
 
     @Subcommand("cells")
-    @CommandPermission("copsandrobbers.candr")
+    @CommandPermission("copsandrobbers.opencells")
     @Description("Opens the cell doors in your jail when they are vulnerable, for robbers")
     public void onOpenCells(Player player, @Conditions("isPlayer") @Flags("noArg") GameSession session) {
         if (session.getPlayerState(player) == PlayerState.COP) {

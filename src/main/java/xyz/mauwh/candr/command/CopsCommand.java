@@ -2,6 +2,7 @@ package xyz.mauwh.candr.command;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Flags;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +20,7 @@ public class CopsCommand extends BaseCommand {
     }
 
     @CommandAlias("cops")
+    @CommandPermission("copsandrobbers.cops")
     public void onCops(@NotNull Player player, @Flags("noArg") GameSession session) {
         Message message;
         if (session == null) {

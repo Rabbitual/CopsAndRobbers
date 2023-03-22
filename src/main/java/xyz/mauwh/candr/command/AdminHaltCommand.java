@@ -22,7 +22,7 @@ public class AdminHaltCommand extends BaseCommand {
     }
 
     @Subcommand("engine")
-    @CommandPermission("candr.admin.halt")
+    @CommandPermission("copsandrobbers.admin.halt")
     @Description("Halts the CopsAndRobbers engine, forcefully stopping all sessions until manually resumed")
     public void onHaltEngine(CommandSender sender) {
         if (engine.isActive()) {
@@ -34,7 +34,7 @@ public class AdminHaltCommand extends BaseCommand {
     }
 
     @Subcommand("session")
-    @CommandPermission("candr.admin.halt")
+    @CommandPermission("copsandrobbers.admin.halt")
     @Syntax("[sessionId]")
     @Description("Halts the specified Cops and Robbers session, forcefully stopping it until manually resumed")
     public void onHaltSession(CommandSender sender, GameSession session) {

@@ -24,7 +24,7 @@ public class CandrCommand extends BaseCommand {
     @Subcommand("join")
     @Description("Joins the specified game of cops and robbers if it is active")
     @Syntax("<gameId>")
-    @CommandPermission("copsandrobbers.candr.join")
+    @CommandPermission("copsandrobbers.candr")
     public void onJoin(Player player, GameSession session) {
         session.setPlayerState(player, PlayerState.ROBBER);
         session.teleportRobberToCell(player);
@@ -36,7 +36,7 @@ public class CandrCommand extends BaseCommand {
 
     @Subcommand("leave|quit")
     @Description("Leaves your current game of cops and robbers")
-    @CommandPermission("copsandrobbers.candr.leave")
+    @CommandPermission("copsandrobbers.candr")
     public void onLeave(Player player, @Conditions("isPlayer") @Flags("noArg") GameSession session) {
         session.teleportPlayerToLobby(player);
         int id = session.getRegion().getId();

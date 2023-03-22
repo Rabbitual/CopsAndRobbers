@@ -29,7 +29,7 @@ public class AdminItemCommand extends BaseCommand {
     }
 
     @Subcommand("debug")
-    @CommandPermission("candr.admin.item.debug")
+    @CommandPermission("copsandrobbers.admin.item.debug")
     @Description("Serializes your currently held item stack and sends it as a copyable message for config use")
     public void onItemDebug(@NotNull Player player) {
         ItemStack heldItem = player.getInventory().getItemInMainHand();
@@ -46,7 +46,7 @@ public class AdminItemCommand extends BaseCommand {
 
 
     @Subcommand("add")
-    @CommandPermission("candr.admin.item.add")
+    @CommandPermission("copsandrobbers.admin.item.add")
     @Syntax("[cops|robbers]")
     @CommandCompletion("cops|robbers")
     @Description("Adds your currently held item stack to the specified list of items")

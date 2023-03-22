@@ -24,7 +24,7 @@ public class AdminSettingsCommand extends BaseCommand {
     }
 
     @Subcommand("save")
-    @CommandPermission("candr.admin.settings.save")
+    @CommandPermission("copsandrobbers.admin.settings.save")
     @Description("Saves any changes made in-game to the CopsAndRobbers engine's settings")
     public void onSave(CommandSender sender) {
         engine.getSettings().save();
@@ -32,7 +32,7 @@ public class AdminSettingsCommand extends BaseCommand {
     }
 
     @Subcommand("reload")
-    @CommandPermission("candr.admin.settings.reload")
+    @CommandPermission("copsandrobbers.admin.settings.reload")
     @Description("Reloads all settings for the CopsAndRobbers engine from file")
     public void onReload(CommandSender sender) {
         engine.getSettings().reload();

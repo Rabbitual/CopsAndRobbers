@@ -22,6 +22,7 @@ public class AdminStartCommand extends BaseCommand {
     }
 
     @Subcommand("engine")
+    @CommandPermission("copsandrobbers.admin.start")
     @Description("Starts the CopsAndRobbers engine if it is not already active")
     public void onEngineStart(CommandSender sender) {
         if (!engine.isActive()) {
@@ -34,6 +35,7 @@ public class AdminStartCommand extends BaseCommand {
 
     @Subcommand("session")
     @Syntax("[sessionId]")
+    @CommandPermission("copsandrobbers.admin.start")
     @Description("Starts the specified Cops and Robbers session if it is not already active")
     public void onSessionStart(CommandSender sender, GameSession session) {
         if (!engine.isActive()) {
