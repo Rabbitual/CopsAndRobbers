@@ -36,6 +36,7 @@ public class AdminSettingsCommand extends BaseCommand {
     @Description("Reloads all settings for the CopsAndRobbers engine from file")
     public void onReload(CommandSender sender) {
         engine.getSettings().reload();
+        engine.getSettings().logSettings();
         messageHandler.sendMessage(sender, Message.RELOADED_ENGINE_SETTINGS, true);
     }
 
