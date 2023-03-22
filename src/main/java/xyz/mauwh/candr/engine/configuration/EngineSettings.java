@@ -20,6 +20,7 @@ public class EngineSettings {
 
     private final File file;
     private final Logger logger;
+    private YamlConfiguration configuration;
     private int maxGameDuration;
     private int copsSelectionDelay;
     private double doorVulnerabilityChance;
@@ -43,7 +44,7 @@ public class EngineSettings {
      * Loads all configured settings from the provided {@link org.bukkit.configuration.file.YamlConfiguration}
      */
     public void reload() {
-        YamlConfiguration configuration = YamlConfiguration.loadConfiguration(file);
+        configuration = YamlConfiguration.loadConfiguration(file);
 
         List<?> emptyList = Collections.emptyList();
         List<?> serializedCopItems = configuration.getList("cop-items", emptyList);
@@ -62,37 +63,25 @@ public class EngineSettings {
         maxGameDuration = configuration.getInt("max-game-duration");
         winMaterial = Material.valueOf(configuration.getString("win-material", "AIR").toUpperCase());
         lobbySpawn = configuration.getLocation("lobby-spawn");
-
-        logSettings();
-        if (!configuration.isConfigurationSection("lobby-spawn")) {
-            logger.warning("Unable to set lobby spawn: no lobby configured");
-        } else if (lobbySpawn == null) {
-            logger.warning("Unable to set lobby: unable to find world with name '" + configuration.getString("lobby-spawn.world") + "'");
-        }
-
-        if (winMaterial == Material.AIR || !winMaterial.isBlock()) {
-            logger.warning(String.format("Win material %s is not a valid block, this may affect the game's expected behavior", winMaterial));
-        }
     }
 
     public void save() {
-        YamlConfiguration config = new YamlConfiguration();
-        config.set("cop-items", copItems);
-        config.set("robber-items", robberItems);
-        config.set("min-players-three-cops", minPlayersThreeCops);
-        config.set("min-players-two-cops", minPlayersTwoCops);
-        config.set("max-players", maxPlayers);
-        config.set("cops-selection-delay", copsSelectionDelay);
-        config.set("door-malfunction-duration", doorMalfunctionDuration);
-        config.set("door-vulnerability-duration", doorVulnerabilityInterval);
-        config.set("door-vulnerability-interval", doorVulnerabilityInterval);
-        config.set("door-vulnerability-chance", doorVulnerabilityChance);
-        config.set("max-game-duration", maxGameDuration);
-        config.set("win-material", winMaterial.toString());
-        config.set("lobby-spawn", lobbySpawn);
+        configuration.set("cop-items", copItems);
+        configuration.set("robber-items", robberItems);
+        configuration.set("min-players-three-cops", minPlayersThreeCops);
+        configuration.set("min-players-two-cops", minPlayersTwoCops);
+        configuration.set("max-players", maxPlayers);
+        configuration.set("cops-selection-delay", copsSelectionDelay);
+        configuration.set("door-malfunction-duration", doorMalfunctionDuration);
+        configuration.set("door-vulnerability-duration", doorVulnerabilityInterval);
+        configuration.set("door-vulnerability-interval", doorVulnerabilityInterval);
+        configuration.set("door-vulnerability-chance", doorVulnerabilityChance);
+        configuration.set("max-game-duration", maxGameDuration);
+        configuration.set("win-material", winMaterial.toString());
+        configuration.set("lobby-spawn", lobbySpawn);
 
         try {
-            config.save(file);
+            configuration.save(file);
         } catch (IOException err) {
             logger.severe("An unexpected error occurred while attempting to save CopsAndRobbers engine settings:");
             err.printStackTrace();
@@ -113,7 +102,7 @@ public class EngineSettings {
     /**
      * Logs all configured settings to console
      */
-    private void logSettings() {
+    public void logSettings() {
         logger.info("-------- Cops And Robbers Engine Settings --------");
         logger.info("Max game duration: " + maxGameDuration);
         logger.info("Cops selection delay: " + copsSelectionDelay);
@@ -128,6 +117,16 @@ public class EngineSettings {
         logger.info("Cop items: " + copItems.size());
         logger.info("Robber items: " + robberItems.size());
         logger.info("Lobby spawnpoint: " + lobbySpawn);
+
+        if (!configuration.isConfigurationSection("lobby-spawn")) {
+            logger.warning("Unable to set lobby spawn: no lobby configured");
+        } else if (lobbySpawn == null) {
+            logger.warning("Unable to set lobby: unable to find world with name '" + configuration.getString("lobby-spawn.world") + "'");
+        }
+
+        if (winMaterial == Material.AIR || !winMaterial.isBlock()) {
+            logger.warning(String.format("Win material %s is not a valid block, this may affect the game's expected behavior", winMaterial));
+        }
     }
 
     /**
