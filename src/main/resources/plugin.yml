@@ -9,7 +9,15 @@ permissions:
     default: true
   copsandrobbers.opencells:
     default: true
+  copsandrobbers.admin.halt:
+    default: op
+  copsandrobbers.admin.start:
+    default: op
   copsandrobbers.admin.item.add:
     default: op
   copsandrobbers.admin.item.debug:
+    default: op
+  copsandrobbers.admin.settings.save:
+    default: op
+  copsandrobbers.admin.settings.reload:
     default: op
