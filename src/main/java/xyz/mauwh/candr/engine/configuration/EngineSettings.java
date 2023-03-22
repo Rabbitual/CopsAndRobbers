@@ -21,19 +21,6 @@ public class EngineSettings {
     private final File file;
     private final Logger logger;
     private YamlConfiguration configuration;
-    private int maxGameDuration;
-    private int copsSelectionDelay;
-    private double doorVulnerabilityChance;
-    private int doorVulnerabilityInterval;
-    private int doorVulnerabilityDuration;
-    private int doorMalfunctionDuration;
-    private int maxPlayers;
-    private int minPlayersTwoCops;
-    private int minPlayersThreeCops;
-    private Material winMaterial;
-    private List<ItemStack> copItems;
-    private List<ItemStack> robberItems;
-    private Location lobbySpawn;
 
     public EngineSettings(@NotNull File file, @NotNull Logger logger) {
         this.file = file;
@@ -45,41 +32,9 @@ public class EngineSettings {
      */
     public void reload() {
         configuration = YamlConfiguration.loadConfiguration(file);
-
-        List<?> emptyList = Collections.emptyList();
-        List<?> serializedCopItems = configuration.getList("cop-items", emptyList);
-        List<?> serializedRobberItems = configuration.getList("robber-items", emptyList);
-        copItems = getMutableCopyOfItemStackList(serializedCopItems);
-        robberItems = getMutableCopyOfItemStackList(serializedRobberItems);
-
-        minPlayersThreeCops = configuration.getInt("min-players-three-cops");
-        minPlayersTwoCops = configuration.getInt("min-players-two-cops");
-        maxPlayers = configuration.getInt("max-players");
-        copsSelectionDelay = configuration.getInt("cops-selection-delay");
-        doorMalfunctionDuration = configuration.getInt("door-malfunction-duration");
-        doorVulnerabilityDuration = configuration.getInt("door-vulnerability-duration");
-        doorVulnerabilityInterval = configuration.getInt("door-vulnerability-interval");
-        doorVulnerabilityChance = configuration.getDouble("door-vulnerability-chance");
-        maxGameDuration = configuration.getInt("max-game-duration");
-        winMaterial = Material.valueOf(configuration.getString("win-material", "AIR").toUpperCase());
-        lobbySpawn = configuration.getLocation("lobby-spawn");
     }
 
     public void save() {
-        configuration.set("cop-items", copItems);
-        configuration.set("robber-items", robberItems);
-        configuration.set("min-players-three-cops", minPlayersThreeCops);
-        configuration.set("min-players-two-cops", minPlayersTwoCops);
-        configuration.set("max-players", maxPlayers);
-        configuration.set("cops-selection-delay", copsSelectionDelay);
-        configuration.set("door-malfunction-duration", doorMalfunctionDuration);
-        configuration.set("door-vulnerability-duration", doorVulnerabilityInterval);
-        configuration.set("door-vulnerability-interval", doorVulnerabilityInterval);
-        configuration.set("door-vulnerability-chance", doorVulnerabilityChance);
-        configuration.set("max-game-duration", maxGameDuration);
-        configuration.set("win-material", winMaterial.toString());
-        configuration.set("lobby-spawn", lobbySpawn);
-
         try {
             configuration.save(file);
         } catch (IOException err) {
@@ -88,43 +43,33 @@ public class EngineSettings {
         }
     }
 
-    @NotNull
-    private List<ItemStack> getMutableCopyOfItemStackList(@NotNull List<?> orig) {
-        List<ItemStack> list = new ArrayList<>();
-        for (Object o : orig) {
-            if (o instanceof ItemStack) {
-                list.add((ItemStack)o);
-            }
-        }
-        return list;
-    }
-
     /**
      * Logs all configured settings to console
      */
     public void logSettings() {
         logger.info("-------- Cops And Robbers Engine Settings --------");
-        logger.info("Max game duration: " + maxGameDuration);
-        logger.info("Cops selection delay: " + copsSelectionDelay);
-        logger.info("Door vulnerability chance: " + (doorVulnerabilityChance * 100) + "%");
-        logger.info("Door vulnerability interval: " + doorVulnerabilityInterval);
-        logger.info("Door vulnerability duration: " + doorVulnerabilityDuration);
-        logger.info("Door malfunction duration: " + doorMalfunctionDuration);
-        logger.info("Max players: " + maxPlayers);
-        logger.info("Min players two cops: " + minPlayersTwoCops);
-        logger.info("Min players three cops: " + minPlayersThreeCops);
-        logger.info("Win material: " + winMaterial);
-        logger.info("Cop items: " + copItems.size());
-        logger.info("Robber items: " + robberItems.size());
-        logger.info("Lobby spawnpoint: " + lobbySpawn);
+        logger.info("Max game duration: " + getMaxGameDuration());
+        logger.info("Cops selection delay: " + getCopsSelectionDelay());
+        logger.info("Door vulnerability chance: " + (getDoorVulnerabilityChance() * 100) + "%");
+        logger.info("Door vulnerability interval: " + getDoorVulnerabilityInterval());
+        logger.info("Door vulnerability duration: " + getDoorVulnerabilityDuration());
+        logger.info("Door malfunction duration: " + getDoorMalfunctionDuration());
+        logger.info("Max players: " + getMaxPlayers());
+        logger.info("Min players two cops: " + getMinPlayersTwoCops());
+        logger.info("Min players three cops: " + getMinPlayersThreeCops());
+        logger.info("Win material: " + getWinMaterial());
+        logger.info("Cop items: " + getCopItems().size());
+        logger.info("Robber items: " + getRobberItems().size());
+        logger.info("Lobby spawnpoint: " + getLobbySpawn());
 
         if (!configuration.isConfigurationSection("lobby-spawn")) {
             logger.warning("Unable to set lobby spawn: no lobby configured");
-        } else if (lobbySpawn == null) {
+        } else if (getLobbySpawn() == null) {
             logger.warning("Unable to set lobby: unable to find world with name '" + configuration.getString("lobby-spawn.world") + "'");
         }
 
-        if (winMaterial == Material.AIR || !winMaterial.isBlock()) {
+        Material winMaterial = getWinMaterial();
+        if (winMaterial.isAir() || !winMaterial.isBlock()) {
             logger.warning(String.format("Win material %s is not a valid block, this may affect the game's expected behavior", winMaterial));
         }
     }
@@ -134,7 +79,11 @@ public class EngineSettings {
      * @return the max game duration
      */
     public int getMaxGameDuration() {
-        return maxGameDuration;
+        return configuration.getInt("max-game-duration");
+    }
+
+    public void setMaxGameDuration(int maxGameDuration) {
+        configuration.set("max-game-duration", maxGameDuration);
     }
 
     /**
@@ -142,7 +91,11 @@ public class EngineSettings {
      * @return the delay before cops selection
      */
     public int getCopsSelectionDelay() {
-        return copsSelectionDelay;
+        return configuration.getInt("cops-selection-delay");
+    }
+
+    public void setCopsSelectionDelay( int copsSelectionDelay) {
+        configuration.set("cops-selection-delay", copsSelectionDelay);
     }
 
     /**
@@ -151,7 +104,11 @@ public class EngineSettings {
      * @return the door vulnerability chance
      */
     public double getDoorVulnerabilityChance() {
-        return doorVulnerabilityChance;
+        return configuration.getDouble("door-vulnerability-chance");
+    }
+
+    public void setDoorVulnerabilityChance(int doorVulnerabilityChance) {
+        configuration.set("door-vulnerability-chance", doorVulnerabilityChance);
     }
 
     /**
@@ -160,7 +117,11 @@ public class EngineSettings {
      * @return the door vulnerability interval
      */
     public int getDoorVulnerabilityInterval() {
-        return doorVulnerabilityInterval;
+        return configuration.getInt("door-vulnerability-interval");
+    }
+
+    public void setDoorVulnerabilityInterval(int doorVulnerabilityInterval) {
+        configuration.set("door-vulnerability-interval", doorVulnerabilityInterval);
     }
 
     /**
@@ -168,7 +129,11 @@ public class EngineSettings {
      * @return the door vulnerability duration
      */
     public int getDoorVulnerabilityDuration() {
-        return doorVulnerabilityDuration;
+        return configuration.getInt("door-vulnerability-duration");
+    }
+
+    public void setDoorVulnerabilityDuration(int doorVulnerabilityDuration) {
+        configuration.set("door-vulnerability-duration", doorVulnerabilityDuration);
     }
 
     /**
@@ -176,7 +141,11 @@ public class EngineSettings {
      * @return the door malfunction duration
      */
     public int getDoorMalfunctionDuration() {
-        return doorMalfunctionDuration;
+        return configuration.getInt("door-malfunction-duration");
+    }
+
+    public void setDoorMalfunctionDuration(int doorMalfunctionDuration) {
+        configuration.set("door-malfunction-duration", doorMalfunctionDuration);
     }
 
     /**
@@ -184,7 +153,11 @@ public class EngineSettings {
      * @return the max players for a session
      */
     public int getMaxPlayers() {
-        return maxPlayers;
+        return configuration.getInt("max-players");
+    }
+
+    public void setMaxPlayers(int maxPlayers) {
+        configuration.set("max-players", maxPlayers);
     }
 
     /**
@@ -192,7 +165,11 @@ public class EngineSettings {
      * @return the minimum players for two cops
      */
     public int getMinPlayersTwoCops() {
-        return minPlayersTwoCops;
+        return configuration.getInt("min-players-two-cops");
+    }
+
+    public void setMinPlayersThreeCops(int minPlayersThreeCops) {
+        configuration.set("min-players-three-cops", minPlayersThreeCops);
     }
 
     /**
@@ -200,7 +177,11 @@ public class EngineSettings {
      * @return the minimum players for three cops
      */
     public int getMinPlayersThreeCops() {
-        return minPlayersThreeCops;
+        return configuration.getInt("min-players-three-cops");
+    }
+
+    public void setMinPlayersTwoCops(int minPlayersTwoCops) {
+        configuration.set("min-players-two-cops", minPlayersTwoCops);
     }
 
     /**
@@ -209,7 +190,16 @@ public class EngineSettings {
      */
     @NotNull
     public Material getWinMaterial() {
-        return winMaterial;
+        String materialName = configuration.getString("win-material", "AIR");
+        try {
+            return Material.valueOf(materialName.toUpperCase());
+        } catch (IllegalArgumentException err) {
+            return Material.AIR;
+        }
+    }
+
+    public void setWinMaterial(@NotNull Material winMaterial) {
+        configuration.set("win-material", winMaterial.toString());
     }
 
     /**
@@ -218,7 +208,12 @@ public class EngineSettings {
      */
     @NotNull
     public List<ItemStack> getCopItems() {
-        return copItems;
+        return configuration.getList("cop-items", Collections.emptyList()).stream().
+                filter(e -> e instanceof ItemStack).map(e -> (ItemStack)e).toList();
+    }
+
+    public void setCopItems(@NotNull List<ItemStack> copItems) {
+        configuration.set("cop-items", copItems);
     }
 
     /**
@@ -227,7 +222,12 @@ public class EngineSettings {
      */
     @NotNull
     public List<ItemStack> getRobberItems() {
-        return robberItems;
+        return configuration.getList("robber-items", Collections.emptyList()).stream().
+                filter(e -> e instanceof ItemStack).map(e -> (ItemStack)e).toList();
+    }
+
+    public void setRobberItems(@NotNull List<ItemStack> robberItems) {
+        configuration.set("robber-items", robberItems);
     }
 
     /**
@@ -236,7 +236,11 @@ public class EngineSettings {
      */
     @Nullable
     public Location getLobbySpawn() {
-        return lobbySpawn;
+        return configuration.getLocation("lobby-spawn");
+    }
+
+    public void setLobbySpawn(@NotNull Location lobbySpawn) {
+        configuration.set("lobby-spawn", lobbySpawn);
     }
 
 }
