@@ -63,7 +63,6 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
 
         BukkitCommandContexts contexts = (BukkitCommandContexts)commandManager.getCommandContexts();
         contexts.registerIssuerAwareContext(GameSession.class, new GameSessionContextResolver(engine));
-        contexts.registerIssuerAwareContext(Material.class, new MaterialContextResolver());
 
         commandManager.registerCommand(new CandrCommand(messageHandler));
         commandManager.registerCommand(new CopsCommand(messageHandler));
