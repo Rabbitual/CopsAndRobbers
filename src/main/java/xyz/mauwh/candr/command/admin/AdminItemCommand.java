@@ -1,4 +1,4 @@
-package xyz.mauwh.candr.command;
+package xyz.mauwh.candr.command.admin;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.InvalidCommandArgument;
