@@ -53,6 +53,10 @@ public class GameSession {
         return region;
     }
 
+    public int getId() {
+        return region.getId();
+    }
+
     public boolean setPlayerState(@NotNull Player player, PlayerState state) {
         return state != playerStates.put(player.getUniqueId(), state);
     }

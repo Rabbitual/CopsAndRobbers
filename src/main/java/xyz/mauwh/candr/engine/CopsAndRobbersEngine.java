@@ -96,7 +96,7 @@ public class CopsAndRobbersEngine {
             GameRegion region = serializer.deserialize(serializedRegion);
             return new GameSession(this, region);
         }).forEach(session -> {
-            int id = session.getRegion().getId();
+            int id = session.getId();
             if (sessions.containsKey(id)) {
                 logger.warning("Unable to load region: game region with id '" + id + "' already exists");
                 return;

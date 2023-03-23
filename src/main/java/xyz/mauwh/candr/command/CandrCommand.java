@@ -28,7 +28,7 @@ public class CandrCommand extends BaseCommand {
     public void onJoin(Player player, GameSession session) {
         session.setPlayerState(player, PlayerState.ROBBER);
         session.teleportRobberToCell(player);
-        messageHandler.sendMessage(player, Message.JOINED_GAME, true, session.getRegion().getId());
+        messageHandler.sendMessage(player, Message.JOINED_GAME, true, session.getId());
         if (!session.hasMaxAllowedCops()) {
             messageHandler.sendMessage(player, Message.JAIL_COULD_USE_COPS, true);
         }
@@ -39,7 +39,7 @@ public class CandrCommand extends BaseCommand {
     @CommandPermission("copsandrobbers.candr")
     public void onLeave(Player player, @Conditions("isPlayer") @Flags("noArg") GameSession session) {
         session.teleportPlayerToLobby(player);
-        int id = session.getRegion().getId();
+        int id = session.getId();
         messageHandler.sendMessage(player, Message.LEFT_GAME, true, id);
 
         boolean wasRobber = session.getPlayerState(player).isRobber();

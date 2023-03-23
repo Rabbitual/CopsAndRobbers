@@ -40,7 +40,7 @@ public class AdminHaltCommand extends BaseCommand {
     public void onHaltSession(CommandSender sender, GameSession session) {
         if (engine.isActive() && session.isActive()) {
             session.endGame(null, true);
-            messageHandler.broadcast(Message.SESSION_NOW_HALTED, true, session.getRegion().getId());
+            messageHandler.broadcast(Message.SESSION_NOW_HALTED, true, session.getId());
         } else {
             messageHandler.sendMessage(sender, Message.SESSION_ALREADY_HALTED, true);
         }

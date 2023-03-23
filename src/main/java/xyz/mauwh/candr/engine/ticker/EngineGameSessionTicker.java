@@ -101,7 +101,7 @@ public class EngineGameSessionTicker {
         while (!(session.getCopApplicants().isEmpty() || session.hasMaxAllowedCops())) {
             Player player = Objects.requireNonNull(selectRandomNewCop());
             BukkitAudiences audiences = messageHandler.getAudiences();
-            messageHandler.sendMessage(audiences.all(), Message.FIRST_COP_SELECTED, true, player.getDisplayName(), session.getRegion().getId());
+            messageHandler.sendMessage(audiences.all(), Message.FIRST_COP_SELECTED, true, player.getDisplayName(), session.getId());
         }
     }
 
