@@ -3,6 +3,7 @@ package xyz.mauwh.candr;
 import co.aikar.commands.*;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -10,7 +11,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.command.*;
 import xyz.mauwh.candr.command.context.GameSessionContextResolver;
-import xyz.mauwh.candr.command.context.MaterialContextResolver;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
 import xyz.mauwh.candr.game.GameSession;
@@ -20,6 +20,8 @@ import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 public final class CopsAndRobbersPlugin extends JavaPlugin {
@@ -60,6 +62,33 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
                 throw new ConditionFailedException();
             }
         });
+
+        conditions.addCondition(Material.class, "nonAirBlock", (context, cmdContext, material) -> {
+            if (material.isAir() || !material.isBlock()) {
+                cmdContext.getIssuer().sendMessage(ChatColor.RED + "Material must be a non-air block");
+                throw new InvalidCommandArgument();
+            }
+        });
+
+        CommandCompletions<?> completions = commandManager.getCommandCompletions();
+        completions.registerCompletion("nonAirBlockMaterial",
+                context -> Arrays.stream(Material.values())
+                        .filter(material -> material.isBlock() && !material.isAir())
+                        .map(Object::toString).toList());
+
+        completions.registerStaticCompletion("engineSetting", List.of(
+                "max-game-duration",
+                "cops-selection-delay",
+                "door-vulnerability-chance",
+                "door-vulnerability-interval",
+                "door-vulnerability-duration",
+                "door-malfunction-duration",
+                "max-players",
+                "min-players-two-cops",
+                "min-players-three-cops",
+                "win-material",
+                "lobby-spawn"
+        ));
 
         BukkitCommandContexts contexts = (BukkitCommandContexts)commandManager.getCommandContexts();
         contexts.registerIssuerAwareContext(GameSession.class, new GameSessionContextResolver(engine));

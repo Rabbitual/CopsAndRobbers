@@ -107,7 +107,7 @@ public class EngineSettings {
         return configuration.getDouble("door-vulnerability-chance");
     }
 
-    public void setDoorVulnerabilityChance(int doorVulnerabilityChance) {
+    public void setDoorVulnerabilityChance(double doorVulnerabilityChance) {
         configuration.set("door-vulnerability-chance", doorVulnerabilityChance);
     }
 
