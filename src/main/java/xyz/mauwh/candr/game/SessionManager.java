@@ -167,6 +167,7 @@ public class SessionManager {
     }
 
     public void changeDoorState(@NotNull GameSession session, @NotNull DoorState state) {
+        session.setDoorState(state);
         switch (state) {
             case SECURE -> setDoorsOpen(session.getRegion(), false);
             case VULNERABLE -> messageHandler.broadcast(Message.VULNERABILITY_DETECTED, false, session.getId());
