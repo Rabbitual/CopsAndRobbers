@@ -46,9 +46,8 @@ public class CandrCommand extends BaseCommand {
         int id = session.getId();
         messageHandler.sendMessage(player, Message.LEFT_GAME, true, id);
 
-        boolean wasRobber = session.getPlayerState(player).isRobber();
-        session.removePlayer(player);
-        if (wasRobber) {
+        PlayerState oldState = session.removePlayer(player);
+        if (oldState.isRobber()) {
             return;
         }
 

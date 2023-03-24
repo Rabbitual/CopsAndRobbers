@@ -142,8 +142,8 @@ public class SessionManager {
         teleportToLobby(player);
         messageHandler.sendMessage(player, Message.LEFT_GAME, true, session.getId());
 
-        boolean wasCop = session.getPlayerState(player) == PlayerState.COP;
-        session.removePlayer(player);
+        PlayerState oldState = session.removePlayer(player);
+        boolean wasCop = (oldState == PlayerState.COP);
         if (wasCop && !session.hasMaxAllowedCops()) {
             messageHandler.broadcast(Message.COP_RETIRED, true, session.getId());
         }

@@ -61,8 +61,8 @@ public class GameSession {
         return state != playerStates.put(uuid, state);
     }
 
-    public boolean removePlayer(@NotNull Player player) {
-        return playerStates.remove(player.getUniqueId()) != null;
+    public PlayerState removePlayer(@NotNull Player player) {
+        return playerStates.remove(player.getUniqueId());
     }
 
     public PlayerState getPlayerState(@NotNull Player player) {
