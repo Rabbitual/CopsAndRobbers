@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.game.GameSession;
+import xyz.mauwh.candr.game.SessionManager;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
@@ -13,20 +14,20 @@ import xyz.mauwh.message.MessageHandler;
 @Subcommand("admin|a start|resume")
 public class AdminStartCommand extends BaseCommand {
 
-    private final CopsAndRobbersEngine engine;
+    private final SessionManager sessionManager;
     private final MessageHandler messageHandler;
 
-    public AdminStartCommand(@NotNull CopsAndRobbersEngine engine) {
-        this.engine = engine;
-        this.messageHandler = engine.getMessageHandler();
+    public AdminStartCommand(@NotNull SessionManager sessionManager, @NotNull MessageHandler messageHandler) {
+        this.sessionManager = sessionManager;
+        this.messageHandler = messageHandler;
     }
 
     @Subcommand("engine")
     @CommandPermission("copsandrobbers.admin.start")
     @Description("Starts the CopsAndRobbers engine if it is not already active")
     public void onEngineStart(CommandSender sender) {
-        if (!engine.isActive()) {
-            engine.start();
+        if (!sessionManager.isActive()) {
+            sessionManager.initializeTask();
             messageHandler.broadcast(Message.ENGINE_NOW_RESUMED, true);
         } else {
             messageHandler.sendMessage(sender, Message.ENGINE_NOT_HALTED, true);
@@ -38,10 +39,10 @@ public class AdminStartCommand extends BaseCommand {
     @CommandPermission("copsandrobbers.admin.start")
     @Description("Starts the specified Cops and Robbers session if it is not already active")
     public void onSessionStart(CommandSender sender, GameSession session) {
-        if (!engine.isActive()) {
+        if (!sessionManager.isActive()) {
             messageHandler.sendMessage(sender, Message.ENGINE_IS_HALTED, true);
         } else if (!session.isActive()) {
-            session.start();
+            sessionManager.start(session);
             messageHandler.broadcast(Message.SESSION_NOW_RESUMED, true);
         } else {
             messageHandler.sendMessage(sender, Message.SESSION_NOT_HALTED, true);

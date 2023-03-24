@@ -18,6 +18,7 @@ import xyz.mauwh.candr.command.context.GameSessionContextResolver;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
 import xyz.mauwh.candr.game.GameSession;
+import xyz.mauwh.candr.game.SessionManager;
 import xyz.mauwh.candr.listener.PlayerInteractListener;
 import xyz.mauwh.candr.engine.PrisonInteractionsHandler;
 import xyz.mauwh.message.Message;
@@ -94,22 +95,23 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
                 "lobby-spawn"
         ));
 
+        SessionManager sessionManager = engine.getSessionManager();
         BukkitCommandContexts contexts = (BukkitCommandContexts)commandManager.getCommandContexts();
-        contexts.registerIssuerAwareContext(GameSession.class, new GameSessionContextResolver(engine));
+        contexts.registerIssuerAwareContext(GameSession.class, new GameSessionContextResolver(sessionManager, messageHandler));
 
-        commandManager.registerCommand(new CandrCommand(messageHandler));
+        commandManager.registerCommand(new CandrCommand(engine));
         commandManager.registerCommand(new CopsCommand(messageHandler));
-        commandManager.registerCommand(new OpenCellsCommand(messageHandler));
+        commandManager.registerCommand(new OpenCellsCommand(sessionManager, messageHandler));
         commandManager.registerCommand(new AdminItemCommand(engine));
-        commandManager.registerCommand(new AdminHaltCommand(engine));
-        commandManager.registerCommand(new AdminStartCommand(engine));
+        commandManager.registerCommand(new AdminHaltCommand(sessionManager, messageHandler));
+        commandManager.registerCommand(new AdminStartCommand(sessionManager, messageHandler));
         commandManager.registerCommand(new AdminSettingsCommand(engine));
 
-        PrisonInteractionsHandler prisonInteractionsHandler = new PrisonInteractionsHandler(engine);
+        PrisonInteractionsHandler prisonInteractionsHandler = new PrisonInteractionsHandler(sessionManager, messageHandler);
         PlayerInteractListener listener = new PlayerInteractListener(prisonInteractionsHandler);
         getServer().getPluginManager().registerEvents(listener, this);
 
-        engine.start();
+        sessionManager.initializeTask();
     }
 
     @NotNull

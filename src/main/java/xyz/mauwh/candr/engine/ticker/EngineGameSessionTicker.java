@@ -2,12 +2,14 @@ package xyz.mauwh.candr.engine.ticker;
 
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
 import xyz.mauwh.candr.game.DoorState;
 import xyz.mauwh.candr.game.GameSession;
 import xyz.mauwh.candr.game.PlayerState;
+import xyz.mauwh.candr.game.SessionManager;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
@@ -19,6 +21,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class EngineGameSessionTicker {
 
+    private final SessionManager sessionManager;
     private final GameSession session;
     private final MessageHandler messageHandler;
     private EngineSettings settings;
@@ -26,7 +29,8 @@ public class EngineGameSessionTicker {
     private int doorVulnerabilityTick;
     private int doorMalfunctionTick;
 
-    public EngineGameSessionTicker(@NotNull GameSession session, @NotNull MessageHandler messageHandler) {
+    public EngineGameSessionTicker(@NotNull SessionManager sessionManager, @NotNull GameSession session, @NotNull MessageHandler messageHandler) {
+        this.sessionManager = sessionManager;
         this.session = session;
         this.messageHandler = messageHandler;
         this.settings = session.getSettings();
@@ -43,26 +47,28 @@ public class EngineGameSessionTicker {
      * The main heartbeat of any individual game session
      */
     public void tick() {
+        if (!sessionManager.isActive() || !session.isActive()) {
+            return;
+        }
+
         gameTick++;
         if (gameTick >= settings.getMaxGameDuration()) {
-            session.endGame(null, true);
-            session.prepare();
-            session.start();
-            this.reset();
+            sessionManager.stop(session, null, true);
+            reset();
             return;
         }
 
         if (shouldDoorsBecomeVulnerable()) {
-            session.makeDoorsVulnerable();
+            sessionManager.changeDoorState(session, DoorState.VULNERABLE);
             doorVulnerabilityTick = settings.getDoorVulnerabilityDuration();
             return;
         }
 
         DoorState doorState = session.getDoorState();
         if (doorState == DoorState.VULNERABLE && doorVulnerabilityTick-- == 0) {
-            session.restoreDoors();
+            sessionManager.changeDoorState(session, DoorState.SECURE);
         } else if (doorState == DoorState.MALFUNCTIONING && doorMalfunctionTick-- == 0) {
-            session.restoreDoors();
+            sessionManager.changeDoorState(session, DoorState.SECURE);
         }
 
         handleCopsSelection();
@@ -121,10 +127,13 @@ public class EngineGameSessionTicker {
         UUID uuid = copApplicants.get(index);
         Player newCop = Bukkit.getPlayer(uuid);
         Objects.requireNonNull(newCop, "Attempted to select null as new cop");
+
         session.setPlayerState(newCop, PlayerState.COP);
         session.removeCopApplicant(newCop);
-        session.teleportCopToMainRoom(newCop);
         session.getSettings().getCopItems().forEach(newCop.getInventory()::addItem);
+
+        Location mainRoom = session.getRegion().getCopSpawnPoint();
+        newCop.teleport(mainRoom);
         return newCop;
     }
 

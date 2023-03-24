@@ -1,22 +1,17 @@
 package xyz.mauwh.candr.engine;
 
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import xyz.mauwh.candr.CopsAndRobbersPlugin;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
 import xyz.mauwh.candr.engine.configuration.RegionSerializer;
 import xyz.mauwh.candr.game.GameRegion;
 import xyz.mauwh.candr.game.GameSession;
+import xyz.mauwh.candr.game.SessionManager;
 import xyz.mauwh.message.MessageHandler;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class CopsAndRobbersEngine {
@@ -25,21 +20,14 @@ public class CopsAndRobbersEngine {
     private final Logger logger;
     private final EngineSettings settings;
     private final MessageHandler messageHandler;
-    private final Map<Integer, GameSession> sessions;
-    private boolean active;
-    private BukkitRunnable runnable;
+    private final SessionManager sessionManager;
 
     public CopsAndRobbersEngine(@NotNull CopsAndRobbersPlugin plugin, @NotNull EngineSettings settings, @NotNull MessageHandler messageHandler) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
         this.settings = settings;
         this.messageHandler = messageHandler;
-        this.sessions = new HashMap<>();
-    }
-
-    @NotNull
-    public CopsAndRobbersPlugin getPlugin() {
-        return plugin;
+        this.sessionManager = new SessionManager(plugin, this);
     }
 
     @NotNull
@@ -53,32 +41,13 @@ public class CopsAndRobbersEngine {
     }
 
     @NotNull
-    public Map<Integer, GameSession> getSessions() {
-        return Collections.unmodifiableMap(sessions);
-    }
-
-    @Nullable
-    public GameSession getSession(int id) {
-        return sessions.get(id);
+    public SessionManager getSessionManager() {
+        return sessionManager;
     }
 
     @NotNull
     public EngineSettings getSettings() {
         return settings;
-    }
-
-    public boolean isPlayer(@NotNull Player player) {
-        return getGameSession(player) != null;
-    }
-
-    @Nullable
-    public GameSession getGameSession(@NotNull Player player) {
-        for (GameSession session : sessions.values()) {
-            if (session.isPlayer(player)) {
-                return session;
-            }
-        }
-        return null;
     }
 
     public void initialize() {
@@ -90,62 +59,21 @@ public class CopsAndRobbersEngine {
         }
 
         RegionSerializer serializer = new RegionSerializer(logger);
-        List<Map<?, ?>> serializedRegions = config.getMapList("regions");
-
-        serializedRegions.stream().map(serializedRegion -> {
+        for (Map<?, ?> serializedRegion : config.getMapList("regions")) {
             GameRegion region = serializer.deserialize(serializedRegion);
-            return new GameSession(this, region);
-        }).forEach(session -> {
+            GameSession session = new GameSession(this, region);
             int id = session.getId();
-            if (sessions.containsKey(id)) {
+            if (sessionManager.getSession(id) != null) {
                 logger.warning("Unable to load region: game region with id '" + id + "' already exists");
                 return;
             }
-            sessions.put(id, session);
-        });
+            sessionManager.addSession(session);
+            sessionManager.start(session);
+        }
 
-        if (sessions.isEmpty()) {
+        if (sessionManager.getSessions().isEmpty()) {
             logger.info("No existing session configurations found, skipping setup");
         }
-    }
-
-    public void start() {
-        sessions.values().forEach(GameSession::start);
-        this.runnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (active) {
-                    sessions.values().forEach(GameSession::tick);
-                }
-            }
-        };
-        runnable.runTaskTimer(plugin, 0L, 20L);
-        active = true;
-    }
-
-    public void halt() {
-        if (!active) {
-            return;
-        }
-
-        if (!runnable.isCancelled()) {
-            runnable.cancel();
-            runnable = null;
-        }
-
-        sessions.values().forEach(session -> session.endGame(null, true));
-        active = false;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    @NotNull
-    public String[] getSessionIDsAsStringArray() {
-        return sessions.values().stream()
-                .map(session -> session.getRegion().getId()).sorted()
-                .map(String::valueOf).toArray(String[]::new);
     }
 
 }

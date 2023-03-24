@@ -7,18 +7,22 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.game.GameSession;
 import xyz.mauwh.candr.game.PlayerState;
+import xyz.mauwh.candr.game.SessionManager;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
 @CommandAlias("candr")
 public class CandrCommand extends BaseCommand {
 
+    private final SessionManager sessionManager;
     private final MessageHandler messageHandler;
 
-    public CandrCommand(@NotNull MessageHandler messageHandler) {
-        this.messageHandler = messageHandler;
+    public CandrCommand(@NotNull CopsAndRobbersEngine engine) {
+        this.sessionManager = engine.getSessionManager();
+        this.messageHandler = engine.getMessageHandler();
     }
 
     @Subcommand("join")
@@ -27,7 +31,7 @@ public class CandrCommand extends BaseCommand {
     @CommandPermission("copsandrobbers.candr")
     public void onJoin(Player player, GameSession session) {
         session.setPlayerState(player, PlayerState.ROBBER);
-        session.teleportRobberToCell(player);
+        sessionManager.teleportToRandomCell(session.getRegion(), player);
         messageHandler.sendMessage(player, Message.JOINED_GAME, true, session.getId());
         if (!session.hasMaxAllowedCops()) {
             messageHandler.sendMessage(player, Message.JAIL_COULD_USE_COPS, true);
@@ -38,7 +42,7 @@ public class CandrCommand extends BaseCommand {
     @Description("Leaves your current game of cops and robbers")
     @CommandPermission("copsandrobbers.candr")
     public void onLeave(Player player, @Conditions("isPlayer") @Flags("noArg") GameSession session) {
-        session.teleportPlayerToLobby(player);
+        sessionManager.teleportToLobby(player);
         int id = session.getId();
         messageHandler.sendMessage(player, Message.LEFT_GAME, true, id);
 

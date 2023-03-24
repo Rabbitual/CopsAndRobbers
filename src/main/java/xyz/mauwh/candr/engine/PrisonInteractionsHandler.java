@@ -8,15 +8,19 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.game.GameSession;
 import xyz.mauwh.candr.game.PlayerState;
+import xyz.mauwh.candr.game.SessionManager;
+import xyz.mauwh.message.MessageHandler;
 
 import java.util.Objects;
 
 public class PrisonInteractionsHandler {
 
-    private final CopsAndRobbersEngine engine;
+    private final SessionManager sessionManager;
+    private final MessageHandler messageHandler;
 
-    public PrisonInteractionsHandler(@NotNull CopsAndRobbersEngine engine) {
-        this.engine = engine;
+    public PrisonInteractionsHandler(@NotNull SessionManager sessionManager, @NotNull MessageHandler messageHandler) {
+        this.sessionManager = sessionManager;
+        this.messageHandler = messageHandler;
     }
 
     public void onBlockInteraction(PlayerInteractEvent event) {
@@ -25,7 +29,7 @@ public class PrisonInteractionsHandler {
         Action action = event.getAction();
 
         Player player = event.getPlayer();
-        GameSession session = engine.getGameSession(player);
+        GameSession session = sessionManager.getSession(player);
         if (session == null) {
             return;
         }
@@ -34,14 +38,14 @@ public class PrisonInteractionsHandler {
         boolean isRobber = session.getPlayerState(player) != PlayerState.COP;
         boolean canWin = (isWinMaterial && isRobber) && action == Action.RIGHT_CLICK_BLOCK;
         if (canWin) {
-            session.endGame(player, true);
-            session.start();
+            sessionManager.stop(session, player, true);
+            sessionManager.start(session);
             return;
         }
 
         session.getRegion().getNodes().forEach(node -> {
             if (node.canBeUsed(session, player, location, action)) {
-                node.handle(session, player, engine.getMessageHandler());
+                node.handle(session, player, messageHandler);
             }
         });
     }
