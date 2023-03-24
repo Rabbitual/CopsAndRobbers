@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.game.GameSession;
-import xyz.mauwh.candr.game.PlayerState;
 import xyz.mauwh.candr.game.SessionManager;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
@@ -30,30 +29,18 @@ public class CandrCommand extends BaseCommand {
     @Syntax("<gameId>")
     @CommandPermission("copsandrobbers.candr")
     public void onJoin(Player player, GameSession session) {
-        session.setPlayerState(player, PlayerState.ROBBER);
-        sessionManager.teleportToRandomCell(session.getRegion(), player);
-        messageHandler.sendMessage(player, Message.JOINED_GAME, true, session.getId());
-        if (!session.hasMaxAllowedCops()) {
-            messageHandler.sendMessage(player, Message.JAIL_COULD_USE_COPS, true);
+        if (sessionManager.getSession(player) != null) {
+            messageHandler.sendMessage(player, Message.ALREADY_IN_GAME, true);
+            return;
         }
+        sessionManager.onJoin(session, player);
     }
 
     @Subcommand("leave|quit")
     @Description("Leaves your current game of cops and robbers")
     @CommandPermission("copsandrobbers.candr")
     public void onLeave(Player player, @Conditions("isPlayer") @Flags("noArg") GameSession session) {
-        sessionManager.teleportToLobby(player);
-        int id = session.getId();
-        messageHandler.sendMessage(player, Message.LEFT_GAME, true, id);
-
-        PlayerState oldState = session.removePlayer(player);
-        if (oldState.isRobber()) {
-            return;
-        }
-
-        if (!session.hasMaxAllowedCops()) {
-            messageHandler.broadcast(Message.COP_RETIRED, true, id);
-        }
+        sessionManager.onQuit(session, player);
     }
 
     @HelpCommand
