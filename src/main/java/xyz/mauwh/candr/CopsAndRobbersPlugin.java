@@ -11,10 +11,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.command.*;
-import xyz.mauwh.candr.command.admin.AdminHaltCommand;
-import xyz.mauwh.candr.command.admin.AdminItemCommand;
-import xyz.mauwh.candr.command.admin.AdminSettingsCommand;
-import xyz.mauwh.candr.command.admin.AdminStartCommand;
+import xyz.mauwh.candr.command.admin.*;
 import xyz.mauwh.candr.command.context.GameSessionContextResolver;
 import xyz.mauwh.candr.engine.CopsAndRobbersEngine;
 import xyz.mauwh.candr.engine.configuration.EngineSettings;
@@ -108,6 +105,7 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
         commandManager.registerCommand(new AdminHaltCommand(sessionManager, messageHandler));
         commandManager.registerCommand(new AdminStartCommand(sessionManager, messageHandler));
         commandManager.registerCommand(new AdminSettingsCommand(engine));
+        commandManager.registerCommand(new AdminDoorStateCommand(sessionManager));
 
         PrisonInteractionsHandler prisonInteractionsHandler = new PrisonInteractionsHandler(sessionManager, messageHandler);
         PlayerInteractListener interactListener = new PlayerInteractListener(prisonInteractionsHandler);
