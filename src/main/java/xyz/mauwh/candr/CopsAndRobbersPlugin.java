@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import xyz.mauwh.candr.command.*;
@@ -21,6 +22,7 @@ import xyz.mauwh.candr.game.GameSession;
 import xyz.mauwh.candr.game.SessionManager;
 import xyz.mauwh.candr.listener.PlayerInteractListener;
 import xyz.mauwh.candr.engine.PrisonInteractionsHandler;
+import xyz.mauwh.candr.listener.PlayerJoinQuitListener;
 import xyz.mauwh.message.Message;
 import xyz.mauwh.message.MessageHandler;
 
@@ -108,8 +110,11 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
         commandManager.registerCommand(new AdminSettingsCommand(engine));
 
         PrisonInteractionsHandler prisonInteractionsHandler = new PrisonInteractionsHandler(sessionManager, messageHandler);
-        PlayerInteractListener listener = new PlayerInteractListener(prisonInteractionsHandler);
-        getServer().getPluginManager().registerEvents(listener, this);
+        PlayerInteractListener interactListener = new PlayerInteractListener(prisonInteractionsHandler);
+
+        PluginManager pluginManager = getServer().getPluginManager();
+        pluginManager.registerEvents(interactListener, this);
+        pluginManager.registerEvents(new PlayerJoinQuitListener(sessionManager), this);
 
         sessionManager.initializeTask();
     }
