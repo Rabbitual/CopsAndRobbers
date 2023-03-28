@@ -54,7 +54,6 @@ public class EngineGameSessionTicker {
         gameTick++;
         if (gameTick >= settings.getMaxGameDuration()) {
             sessionManager.stop(session, null, true);
-            reset();
             return;
         }
 
@@ -103,9 +102,9 @@ public class EngineGameSessionTicker {
         if (gameTick < settings.getCopsSelectionDelay()) {
             return;
         }
-        // while there are applicants and the session does not have max allowed cops
-        while (!(session.getCopApplicants().isEmpty() || session.hasMaxAllowedCops())) {
+        while (!session.getCopApplicants().isEmpty() && !session.hasMaxAllowedCops()) {
             Player player = Objects.requireNonNull(selectRandomNewCop());
+            session.setPlayerState(player, PlayerState.COP);
             BukkitAudiences audiences = messageHandler.getAudiences();
             messageHandler.sendMessage(audiences.all(), Message.FIRST_COP_SELECTED, true, player.getDisplayName(), session.getId());
         }
@@ -117,13 +116,9 @@ public class EngineGameSessionTicker {
             return null;
         }
 
-        int index = 0;
-        if (gameTick == settings.getCopsSelectionDelay()) {
-            Random random = ThreadLocalRandom.current();
-            int size = copApplicants.size();
-            index = random.nextInt(size);
-        }
-
+        Random random = ThreadLocalRandom.current();
+        int size = copApplicants.size();
+        int index = random.nextInt(size);
         UUID uuid = copApplicants.get(index);
         Player newCop = Bukkit.getPlayer(uuid);
         Objects.requireNonNull(newCop, "Attempted to select null as new cop");
