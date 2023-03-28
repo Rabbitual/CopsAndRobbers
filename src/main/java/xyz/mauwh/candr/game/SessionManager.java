@@ -5,6 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Openable;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,12 +42,13 @@ public class SessionManager {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (!active) {
+                    cancel();
+                }
                 tickers.forEach((session, ticker) -> {
-                    if (!active) {
-                        cancel();
-                    } else if (session.isActive()) {
+                     if (session.isActive()) {
                         ticker.tick();
-                    }
+                     }
                 });
             }
         }.runTaskTimer(plugin, 0L, 20L);
@@ -107,13 +109,9 @@ public class SessionManager {
 
         session.getPlayers().forEach(uuid -> {
             Player player = Bukkit.getPlayer(uuid);
-            Objects.requireNonNull(player);
-            Location lobbySpawn = engine.getSettings().getLobbySpawn();
-            if (lobbySpawn != null) {
-                player.teleport(lobbySpawn);
+            if (player != null) {
+                onQuit(session, player);
             }
-            player.getInventory().clear();
-            session.removePlayer(player);
         });
 
         changeDoorState(session, DoorState.SECURE);
@@ -121,6 +119,8 @@ public class SessionManager {
         if (!restart) {
             session.setActive(false);
             tickers.remove(session);
+        } else {
+            tickers.get(session).reset();
         }
     }
 
@@ -130,12 +130,21 @@ public class SessionManager {
     }
 
     public void onJoin(@NotNull GameSession session, @NotNull Player player) {
+        if (!isActive() || !session.isActive()) {
+            Message message = !isActive() ? Message.ENGINE_IS_HALTED : Message.SESSION_IS_HALTED;
+            messageHandler.sendMessage(player, message, true);
+            return;
+        }
+
         session.setPlayerState(player, PlayerState.ROBBER);
         teleportToRandomCell(session.getRegion(), player);
         messageHandler.sendMessage(player, Message.JOINED_GAME, true, session.getId());
         if (!session.hasMaxAllowedCops()) {
             messageHandler.sendMessage(player, Message.JAIL_COULD_USE_COPS, true);
         }
+
+        List<ItemStack> robberItems = engine.getSettings().getRobberItems();
+        player.getInventory().addItem(robberItems.toArray(ItemStack[]::new));
     }
 
     public void onQuit(@NotNull GameSession session, @NotNull Player player) {
@@ -147,6 +156,8 @@ public class SessionManager {
         if (wasCop && !session.hasMaxAllowedCops()) {
             messageHandler.broadcast(Message.COP_RETIRED, true, session.getId());
         }
+
+        player.getInventory().clear();
     }
 
     public void setChunksForceLoaded(@NotNull GameSession session, boolean loaded) {
