@@ -1,11 +1,13 @@
 package xyz.mauwh.candr.engine;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
+import xyz.mauwh.candr.CopsAndRobbersPlugin;
 import xyz.mauwh.candr.game.GameSession;
 import xyz.mauwh.candr.game.PlayerState;
 import xyz.mauwh.candr.game.SessionManager;
@@ -15,10 +17,12 @@ import java.util.Objects;
 
 public class PrisonInteractionsHandler {
 
+    private final CopsAndRobbersPlugin plugin;
     private final SessionManager sessionManager;
     private final MessageHandler messageHandler;
 
-    public PrisonInteractionsHandler(@NotNull SessionManager sessionManager, @NotNull MessageHandler messageHandler) {
+    public PrisonInteractionsHandler(@NotNull CopsAndRobbersPlugin plugin, @NotNull SessionManager sessionManager, @NotNull MessageHandler messageHandler) {
+        this.plugin = plugin;
         this.sessionManager = sessionManager;
         this.messageHandler = messageHandler;
     }
@@ -45,7 +49,7 @@ public class PrisonInteractionsHandler {
 
         session.getRegion().getNodes().forEach(node -> {
             if (node.canBeUsed(session, player, location, action)) {
-                node.handle(session, player, messageHandler);
+                Bukkit.getScheduler().runTask(plugin, () -> node.handle(session, player, messageHandler));
             }
         });
     }

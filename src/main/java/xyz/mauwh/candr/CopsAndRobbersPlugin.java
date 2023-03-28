@@ -108,7 +108,7 @@ public final class CopsAndRobbersPlugin extends JavaPlugin {
         commandManager.registerCommand(new AdminDoorStateCommand(sessionManager));
         commandManager.registerCommand(new AdminKickCommand(sessionManager));
 
-        PrisonInteractionsHandler prisonInteractionsHandler = new PrisonInteractionsHandler(sessionManager, messageHandler);
+        PrisonInteractionsHandler prisonInteractionsHandler = new PrisonInteractionsHandler(this, sessionManager, messageHandler);
         PlayerInteractListener interactListener = new PlayerInteractListener(prisonInteractionsHandler);
 
         PluginManager pluginManager = getServer().getPluginManager();
